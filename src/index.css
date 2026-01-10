@@ -14,4 +14,45 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}/* Custom Slick Arrows */
+.image-movie-slider .slick-prev:before, 
+.image-movie-slider .slick-next:before {
+    color: #3b82f6; /* Màu xanh blue */
+    font-size: 30px;
+    opacity: 0.8;
+}
+
+.image-movie-slider .slick-prev {
+    left: -35px;
+    z-index: 10;
+}
+
+.image-movie-slider .slick-next {
+    right: -35px;
+    z-index: 10;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.slick-prev:before, .slick-next:before {
+  color: #3b82f6 !important;
+  font-size: 24px !important;
+}
+.slick-prev { left: -30px !important; z-index: 10; }
+.slick-next { right: -30px !important; z-index: 10; }
+
+/* Đảm bảo modal luôn trên cùng */
+.fixed.inset-0.z-\[9999\] {
+    isolation: isolate;
+}
+
+/* Hạ thấp độ ưu tiên của các slick arrows nếu cần */
+.slick-prev, .slick-next {
+    z-index: 10 !important;
+}
+
+/* Đảm bảo phần trailer iframe không bị ảnh hưởng bởi transform của cha */
+iframe {
+    transform: translateZ(0);
 }

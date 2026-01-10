@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { getImageUrl } from "../../utils/getImageUrl";
+import { useState } from "react";
 
 export default function MovieCard({ movie, large = false }) {
   const imageUrl = getImageUrl(movie);
+  const [imgError, setImgError] = useState(false);
+
   
   return (
     <Link
@@ -13,17 +16,13 @@ export default function MovieCard({ movie, large = false }) {
         className={`relative overflow-hidden rounded-xl mb-3 ${large ? "aspect-[9/12]" : "aspect-[2/3]"
           }`}
       >
-        <img
+       <img
           src={imageUrl}
           alt={movie.name || movie.origin_name}
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.06] will-change-transform"
-
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src =
-              "https://via.placeholder.com/300x450/000000/ffffff?text=No+Image";
-          }}
+          // Khi lỗi, chỉ đơn giản là set state thành true
+          onError={() => setImgError(true)}
         />
 
         {/* Overlay */}

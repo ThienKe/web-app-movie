@@ -48,7 +48,7 @@ const fetchMovies = async () => {
     if (items.length === 0) {
       setHasMore(false);
     } else {
-      setMovies((prev) => (page === 1 ? items : [...prev, ...items]));
+      setMovies(items);
       setHasMore(true);
     }
   } catch (err) {

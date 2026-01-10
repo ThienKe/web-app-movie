@@ -136,15 +136,16 @@ export default function HeroSlider() {
                     Phát ngay
                   </Link>
                   <button
-                    onClick={() => toggleFavorite(movie)}
-                    className={`px-6 py-3 rounded-xl font-medium text-lg transition flex items-center gap-2 ${
-                      isFavorite(movie._id)
-                        ? "bg-gray-500 text-white"
-                        : "border-2 border-white hover:bg-white/10"
-                    }`}
-                  >
-                    {isFavorite(movie._id) ? "❤️" : "❤️"}
-                  </button>
+  onClick={() => toggleFavorite(movie)}
+  className={`px-6 py-3 rounded-xl font-medium transition flex items-center gap-2 ${
+    isFavorite(movie._id)
+      ? "bg-red-500/20 hover:bg-red-500/30 border border-red-500 text-red-500"
+      : "bg-white/10 hover:bg-white/20 border border-white text-white"
+  }`}
+>
+  <span className="text-xl">{isFavorite(movie._id) ? "" : ""}</span>
+  {isFavorite(movie._id) ? "Đã thích" : "Yêu thích"}
+</button>
                 </div>
               </div>
 

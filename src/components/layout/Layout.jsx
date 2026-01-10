@@ -42,8 +42,8 @@ export default function Layout() {
 
       {/* ===== CONTENT LAYER ===== */}
       <div className="relative z-10 min-h-screen flex flex-col">
-        <Header />
-
+        
+          <Header />
         {/* chừa chỗ cho header fixed */}
         <main className="flex-1 pt-20">
           <Outlet />

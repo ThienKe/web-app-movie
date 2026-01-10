@@ -4,7 +4,7 @@ import { Facebook, Twitter, Instagram, MessageCircle } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 border-t border-white/10 mt-20 py-12 text-white">
+    <footer className="bg-slate-900 border-t border-white/10 mt-20 py-12 text-white">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         <div className="grid md:grid-cols-3 gap-10">
           {/* Bên trái: Logo link to Trang Chủ + Description */}

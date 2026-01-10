@@ -1,64 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Heart, History, Menu, User, X } from 'lucide-react';
+import { Search, Heart, History, Menu, User as UserIcon, X, LogOut } from 'lucide-react';
 import axios from 'axios';
+import { useAuthContext } from '../../context/AuthContext';
 
 const POSTER_BASE = "https://img.ophim.live/uploads/movies/";
 
-// ===== MENU ITEMS =====
-const danhSach = [
-  { name: "Phim mới", slug: "phim-moi", link: "/danh-sach/phim-moi" },
-  { name: "Phim bộ", slug: "phim-bo", link: "/danh-sach/phim-bo" },
-  { name: "Phim lẻ", slug: "phim-le", link: "/danh-sach/phim-le" },
-  { name: "Hoạt hình", slug: "hoat-hinh", link: "/danh-sach/hoat-hinh" },
-  { name: "Phim Chiếu Rạp", slug: "phim-chieu-rap", link: "/danh-sach/phim-chieu-rap" },
-  { name: "Phim Sắp Chiếu", slug: "phim-sap-chieu", link: "/danh-sach/phim-sap-chieu" },
-  { name: "Phim Đang Chiếu", slug: "phim-dang-chieu", link: "/danh-sach/phim-dang-chieu" },
-  { name: "Phim Hot", slug: "phim-hot", link: "/danh-sach/phim-hot" },
-];
+// ===== DATA =====
+const danhSach = [{ name: "Phim mới", slug: "phim-moi", link: "/danh-sach/phim-moi" }, { name: "Phim bộ", slug: "phim-bo", link: "/danh-sach/phim-bo" }, { name: "Phim lẻ", slug: "phim-le", link: "/danh-sach/phim-le" }, { name: "Hoạt hình", slug: "hoat-hinh", link: "/danh-sach/hoat-hinh" }, { name: "Phim Chiếu Rạp", slug: "phim-chieu-rap", link: "/danh-sach/phim-chieu-rap" }, { name: "Phim Sắp Chiếu", slug: "phim-sap-chieu", link: "/danh-sach/phim-sap-chieu" }, { name: "Phim Đang Chiếu", slug: "phim-dang-chieu", link: "/danh-sach/phim-dang-chieu" }, { name: "Phim Hot", slug: "phim-hot", link: "/danh-sach/phim-hot" }];
+const theLoai = [{ name: "Hành Động", slug: "hanh-dong" }, { name: "Cổ Trang", slug: "co-trang" }, { name: "Kinh Dị", slug: "kinh-di" }, { name: "Tình Cảm", slug: "tinh-cam" }, { name: "Hài Hước", slug: "hai-huoc" }, { name: "Viễn Tưởng", slug: "vien-tuong" }, { name: "Hoạt Hình", slug: "hoat-hinh" }, { name: "Phiêu Lưu", slug: "phieu-luu" }, { name: "Tâm Lý", slug: "tam-ly" }, { name: "Chiến Tranh", slug: "chien-tranh" }, { name: "Khoa Học Viễn Tưởng", slug: "khoa-hoc-vien-tuong" }, { name: "Thần Thoại", slug: "than-thoai" }, { name: "Hình Sự", slug: "hinh-su" }, { name: "Lịch Sử", slug: "lich-su" }, { name: "Âm Nhạc", slug: "am-nhac" }, { name: "Tài Liệu", slug: "tai-lieu" }, { name: "Thể Thao", slug: "the-thao" }, { name: "Phim 18+", slug: "phim-18" }, { name: "Phim 13+", slug: "phim-13" }];
+const quocGia = [{ name: "Hàn Quốc", slug: "han-quoc" }, { name: "Trung Quốc", slug: "trung-quoc" }, { name: "Âu Mỹ", slug: "au-my" }, { name: "Việt Nam", slug: "viet-nam" }, { name: "Nhật Bản", slug: "nhat-ban" }, { name: "Thái Lan", slug: "thai-lan" }, { name: "Ấn Độ", slug: "an-do" }, { name: "Pháp", slug: "phap" }, { name: "Đài Loan", slug: "dai-loan" }, { name: "Hồng Kông", slug: "hong-kong" }, { name: "Anh", slug: "anh" }, { name: "Mỹ", slug: "my" }, { name: "Đức", slug: "duc" }, { name: "Phần Lan", slug: "phan-lan" }, { name: "Nga", slug: "nga" }, { name: "Úc", slug: "uc" }];
 
-const theLoai = [
-  { name: "Hành Động", slug: "hanh-dong" },
-  { name: "Cổ Trang", slug: "co-trang" },
-  { name: "Kinh Dị", slug: "kinh-di" },
-  { name: "Tình Cảm", slug: "tinh-cam" },
-  { name: "Hài Hước", slug: "hai-huoc" },
-  { name: "Viễn Tưởng", slug: "vien-tuong" },
-  { name: "Hoạt Hình", slug: "hoat-hinh" },
-  { name: "Phiêu Lưu", slug: "phieu-luu" },
-  { name: "Tâm Lý", slug: "tam-ly" },
-  { name: "Chiến Tranh", slug: "chien-tranh" },
-  { name: "Khoa Học Viễn Tưởng", slug: "khoa-hoc-vien-tuong" },
-  { name: "Thần Thoại", slug: "than-thoai" },
-  { name: "Hình Sự", slug: "hinh-su" },
-  { name: "Lịch Sử", slug: "lich-su" },
-  { name: "Âm Nhạc", slug: "am-nhac" },
-  { name: "Tài Liệu", slug: "tai-lieu" },
-  { name: "Thể Thao", slug: "the-thao" },
-  { name: "Phim 18+", slug: "phim-18" },
-  { name: "Phim 13+", slug: "phim-13" },
-];
-
-const quocGia = [
-  { name: "Hàn Quốc", slug: "han-quoc" },
-  { name: "Trung Quốc", slug: "trung-quoc" },
-  { name: "Âu Mỹ", slug: "au-my" },
-  { name: "Việt Nam", slug: "viet-nam" },
-  { name: "Nhật Bản", slug: "nhat-ban" },
-  { name: "Thái Lan", slug: "thai-lan" },
-  { name: "Ấn Độ", slug: "an-do" },
-  { name: "Pháp", slug: "phap" },
-  { name: "Đài Loan", slug: "dai-loan" },
-  { name: "Hồng Kông", slug: "hong-kong" },
-  { name: "Anh", slug: "anh" },
-  { name: "Mỹ", slug: "my" },
-  { name: "Đức", slug: "duc" },
-  { name: "Phần Lan", slug: "phan-lan" },
-  { name: "Nga", slug: "nga" },
-  { name: "Úc", slug: "uc" },
-];
-
-const Header = ({ user, logout }) => {
+const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -67,7 +20,15 @@ const Header = ({ user, logout }) => {
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
 
-  /* ===== SEARCH HANDLER ===== */
+  const { user: currentUser, logout: performLogout } = useAuthContext();
+  const isAdmin = currentUser?.role === 'admin';
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
@@ -76,188 +37,139 @@ const Header = ({ user, logout }) => {
     setMobileSearchOpen(false);
   };
 
-  /* ===== SEARCH SUGGESTION ===== */
-  useEffect(() => {
-    if (!searchTerm.trim()) return setSuggestions([]);
-    const controller = new AbortController();
-
-    const fetchSearch = async () => {
-      try {
-        const res = await axios.get(`https://ophim1.com/v1/api/tim-kiem`, {
-          params: { keyword: searchTerm },
-          signal: controller.signal
-        });
-        setSuggestions(res.data?.data?.items || []);
-      } catch (err) {
-        if (err.name !== "CanceledError") console.error(err);
-      }
-    };
-
-    fetchSearch();
-    return () => controller.abort();
-  }, [searchTerm]);
-
-  /* ===== SCROLL EFFECT ===== */
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  const handleLogout = async () => {
+    try {
+      await performLogout();
+      setMobileMenuOpen(false);
+      navigate('/');
+    } catch (error) {
+      console.error("Lỗi đăng xuất:", error);
+    }
+  };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all py-4 px-4 md:px-8 lg:px-12
-      ${scrolled ? 'bg-slate-900/95 backdrop-blur-xl shadow-2xl' : 'bg-transparent'}`}>
+    <>
+      {/* OVERLAY */}
+      {(mobileMenuOpen || mobileSearchOpen) && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45]"
+          onClick={() => { setMobileMenuOpen(false); setMobileSearchOpen(false); }}
+        />
+      )}
 
-      <div className="max-w-screen-2xl mx-auto flex items-center justify-between gap-4">
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4 px-4 md:px-8 lg:px-12 flex items-center justify-between
+        ${scrolled || mobileMenuOpen ? 'bg-slate-900 shadow-2xl' : 'bg-transparent'}`}>
+        
+        {/* LEFT: LOGO */}
+        <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+          <img src="/logo.png" alt="Logo" className="h-9 md:h-11 w-auto object-contain transition group-hover:scale-105" />
+          <span className="text-xl md:text-2xl font-black tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent hidden sm:block">
+            PhimCúĐêm
+          </span>
+        </Link>
 
-        {/* LOGO */}
-        <Link to="/" className="text-white text-2xl font-bold">PhimCúĐêm</Link>
-
-        {/* DESKTOP MENU */}
+        {/* CENTER: DESKTOP NAV */}
         <nav className="hidden lg:flex items-center gap-6">
-          <Link to="/danh-sach/phim-bo" className="text-white hover:text-slate-300">Phim bộ</Link>
-          <Link to="/danh-sach/phim-le" className="text-white hover:text-slate-300">Phim lẻ</Link>
+          <Link to="/danh-sach/phim-bo" className="text-white hover:text-blue-500 transition font-medium">Phim bộ</Link>
+          <Link to="/danh-sach/phim-le" className="text-white hover:text-blue-500 transition font-medium">Phim lẻ</Link>
           <Dropdown title="Danh sách" items={danhSach} type="danh-sach" />
           <Dropdown title="Thể loại" items={theLoai} type="the-loai" />
           <Dropdown title="Quốc gia" items={quocGia} type="quoc-gia" />
         </nav>
 
-        {/* SEARCH + ICONS */}
-        <div className="flex items-center gap-4 relative">
-
-          {/* DESKTOP SEARCH */}
+        {/* RIGHT: ACTIONS */}
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Search Desktop */}
           <div className="hidden md:block relative">
-            <form onSubmit={handleSearch}>
+            <form onSubmit={handleSearch} className="relative">
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                 placeholder="Tìm kiếm phim..."
-                className="bg-slate-800/70 rounded-full px-5 py-3 pr-12 w-72 text-white"
+                className="bg-slate-800/70 rounded-full px-5 py-2 w-48 lg:w-64 text-white focus:ring-1 focus:ring-blue-500 outline-none transition-all"
               />
-              <button className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Search className="w-5 h-5 text-gray-400" />
-              </button>
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             </form>
+          </div>
 
-            {/* SUGGESTIONS */}
-            {searchFocused && suggestions.length > 0 && (
-              <div className="absolute top-full mt-2 w-full bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700 z-50">
-                {suggestions.slice(0, 5).map(m => (
-                  <Link
-                    key={m.slug}
-                    to={`/phim/${m.slug}`}
-                    className="flex gap-4 p-4 hover:bg-slate-800/60 transition"
-                  >
-                    <img src={`${POSTER_BASE}${m.poster_url}`} className="w-12 h-16 object-cover rounded" />
-                    <div>
-                      <p className="text-white font-medium">{m.name}</p>
-                      <p className="text-xs text-gray-400">{m.year}</p>
-                    </div>
-                  </Link>
-                ))}
-                <button
-                  onClick={() => navigate(`/tim-kiem?keyword=${searchTerm}`)}
-                  className="w-full py-3 text-center text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition rounded-b-2xl"
-                >
-                  Toàn bộ kết quả →
-                </button>
+          <Link to="/yeu-thich" className="hidden md:block text-white p-2 hover:bg-white/10 rounded-full"><Heart className="w-5 h-5" /></Link>
+          
+          <button 
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            className="md:hidden p-2 text-white"
+          >
+            <Search className="w-6 h-6" />
+          </button>
+
+          {/* User Section */}
+          <div className="hidden md:flex items-center gap-3">
+            {currentUser ? (
+              <div className="flex items-center gap-3 bg-white/5 p-1 pr-3 rounded-full border border-white/10">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
+                  {currentUser.displayName?.charAt(0).toUpperCase()}
+                </div>
+                <button onClick={handleLogout} className="text-gray-400 hover:text-white transition"><LogOut className="w-4 h-4" /></button>
               </div>
+            ) : (
+              <Link to="/dang-nhap" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-bold text-sm">Đăng nhập</Link>
             )}
           </div>
 
-          {/* ICONS DESKTOP */}
-          <Link to="/yeu-thich" className="hidden md:block"><Heart className="text-white" /></Link>
-          <Link to="/lich-su" className="hidden md:block"><History className="text-white" /></Link>
-          {user ? (
-            <button onClick={logout} className="hidden md:flex items-center gap-2 text-white">
-              <User /> Đăng xuất
-            </button>
-          ) : (
-            <Link to="/dang-nhap" className="hidden md:flex items-center gap-2 text-white">
-              <User /> Đăng nhập
-            </Link>
-          )}
-
-          {/* MOBILE SEARCH + MENU BUTTON */}
-          <button onClick={() => setMobileSearchOpen(!mobileSearchOpen)} className="md:hidden">
-            <Search className="text-white" />
-          </button>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden">
-            {mobileMenuOpen ? <X className="text-white" /> : <Menu className="text-white" />}
+          {/* Hamburger */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-white"
+          >
+            {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
         </div>
-      </div>
 
-      {/* MOBILE SEARCH DROPDOWN */}
-      {mobileSearchOpen && (
-        <div className="md:hidden bg-slate-900/95 backdrop-blur-xl w-full absolute top-full left-0 px-4 py-4 z-40">
-          <form onSubmit={handleSearch}>
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm kiếm phim..."
-              className="w-full px-4 py-3 rounded-full text-black"
-            />
-          </form>
-        </div>
-      )}
+        {/* MOBILE SEARCH (Absolute inside Header) */}
+        {mobileSearchOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-slate-900 p-4 border-t border-slate-800 animate-in slide-in-from-top">
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                autoFocus
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Tìm tên phim..."
+                className="w-full bg-slate-800 text-white px-5 py-3 rounded-xl outline-none"
+              />
+              <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2"><Search className="w-5 h-5 text-white" /></button>
+            </form>
+          </div>
+        )}
 
-      {/* MOBILE MENU DROPDOWN */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-900/95 backdrop-blur-xl w-full absolute top-full left-0 px-4 py-4 flex flex-col gap-3 z-40">
-          <DropdownMobile title="Danh sách" items={danhSach} type="danh-sach" closeMenu={() => setMobileMenuOpen(false)} />
-          <DropdownMobile title="Thể loại" items={theLoai} type="the-loai" closeMenu={() => setMobileMenuOpen(false)} />
-          <DropdownMobile title="Quốc gia" items={quocGia} type="quoc-gia" closeMenu={() => setMobileMenuOpen(false)} />
-          <Link to="/yeu-thich" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-white font-medium">Yêu thích</Link>
-          <Link to="/lich-su" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-white font-medium">Lịch sử</Link>
-          {user ? (
-            <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-gray-300 hover:text-white font-medium flex items-center gap-2">
-              <User /> Đăng xuất
-            </button>
-          ) : (
-            <Link to="/dang-nhap" onClick={() => setMobileMenuOpen(false)} className="text-gray-300 hover:text-white font-medium flex items-center gap-2">
-              <User /> Đăng nhập
-            </Link>
-          )}
-        </div>
-      )}
-    </header>
+        {/* MOBILE MENU */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-slate-900 p-6 flex flex-col gap-4 border-t border-slate-800 shadow-2xl overflow-y-auto max-h-[80vh]">
+             <DropdownMobile title="Danh sách" items={danhSach} type="danh-sach" closeMenu={() => setMobileMenuOpen(false)} />
+             <DropdownMobile title="Thể loại" items={theLoai} type="the-loai" closeMenu={() => setMobileMenuOpen(false)} />
+             <DropdownMobile title="Quốc gia" items={quocGia} type="quoc-gia" closeMenu={() => setMobileMenuOpen(false)} />
+             <Link to="/yeu-thich" onClick={() => setMobileMenuOpen(false)} className="text-white py-3 border-b border-white/5">Phim yêu thích</Link>
+             {!currentUser && <Link to="/dang-nhap" className="bg-blue-600 text-center py-3 rounded-xl font-bold">Đăng nhập</Link>}
+          </div>
+        )}
+      </header>
+    </>
   );
 };
 
-// ===== DROPDOWN DESKTOP =====
+// Các Helper Components (Dropdown, DropdownMobile) giữ nguyên logic cũ của bạn nhưng đảm bảo đóng thẻ đúng...
 function Dropdown({ title, items, type }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="text-white hover:text-slate-300 transition font-medium flex items-center gap-1"
-      >
-        {title} <span className="text-xs">▼</span>
+    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button className="text-white hover:text-blue-500 transition font-medium flex items-center gap-1 py-2">
+        {title} <span className="text-[10px]">▼</span>
       </button>
-
       {open && (
-<div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 w-[800px] bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700 z-50">          <div className="grid grid-cols-5 gap-6 p-6">
+        <div className="absolute left-0 top-full pt-2 w-[500px] z-50">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 grid grid-cols-3 gap-1 shadow-2xl">
             {items.map(item => (
-              <Link
-                key={`${title}-${item.slug}`}
-                to={`/${type}/${item.slug}`}
-                onClick={() => setOpen(false)}
-                className="text-gray-300 hover:text-white hover:bg-slate-800/60 px-4 py-3 transition font-medium"
-              >
+              <Link key={item.slug} to={`/${type}/${item.slug}`} className="text-gray-400 hover:text-white hover:bg-slate-800 px-3 py-2 rounded-md text-sm transition">
                 {item.name}
               </Link>
             ))}
@@ -268,27 +180,17 @@ function Dropdown({ title, items, type }) {
   );
 }
 
-// ===== DROPDOWN MOBILE =====
 function DropdownMobile({ title, items, type, closeMenu }) {
   const [open, setOpen] = useState(false);
-
   return (
-    <div className="flex flex-col">
-      <button
-        onClick={() => setOpen(!open)}
-        className="text-gray-300 hover:text-white font-medium flex justify-between items-center px-2 py-2"
-      >
-        {title} <span>{open ? "▲" : "▼"}</span>
+    <div className="border-b border-white/5">
+      <button onClick={() => setOpen(!open)} className="w-full text-left text-white py-4 flex justify-between">
+        {title} <span>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
-        <div className="flex flex-col pl-4">
+        <div className="grid grid-cols-2 gap-2 pb-4">
           {items.map(item => (
-            <Link
-              key={`${title}-${item.slug}`}
-              to={`/${type}/${item.slug}`}
-              onClick={closeMenu}
-              className="text-gray-400 hover:text-white px-2 py-1 transition"
-            >
+            <Link key={item.slug} to={`/${type}/${item.slug}`} onClick={closeMenu} className="text-gray-400 text-sm py-1">
               {item.name}
             </Link>
           ))}

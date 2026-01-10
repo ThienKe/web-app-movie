@@ -5,6 +5,8 @@ import { useFavorites } from "../hooks/useFavorites";
 import { useNavigate } from "react-router-dom";
 import HlsPlayer from "../components/player/HlsPlayer";
 import { getMoviePeoples } from "../services/api";
+import { useHistory } from "../hooks/useHistory";
+
 
 export default function Watch() {
   const { slug, episodeSlug } = useParams();
@@ -14,80 +16,79 @@ export default function Watch() {
   const [currentServer, setCurrentServer] = useState(0);
   const navigate = useNavigate();
   const [peoples, setPeoples] = useState(null);
-  
+  const { addToHistory } = useHistory();
 
+  // --- 1. FETCH DỮ LIỆU PHIM ---
   useEffect(() => {
     let mounted = true;
-
     const fetchDetail = async () => {
+      setLoading(true); // Reset loading khi đổi slug phim
       try {
         const [movieData, peoplesData] = await Promise.all([
           getMovieDetail(slug),
           getMoviePeoples(slug),
         ]);
-
         if (!mounted) return;
-
         setMovie(movieData);
         setPeoples(peoplesData?.data?.peoples || []);
-
       } catch (err) {
         console.error("Fetch movie error:", err);
-        setMovie(null);
-        setPeoples(null);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
-
     fetchDetail();
     return () => (mounted = false);
   }, [slug]);
 
-
-  if (loading) {
-    return <div className="pt-20 text-center text-2xl text-white">Đang tải phim...</div>;
-  }
-
-  if (!movie) {
-    return <div className="pt-20 text-center text-2xl text-white">Không tìm thấy phim</div>;
-  }
-
-  // ===== XỬ LÝ SERVER + EPISODE =====
-  const servers = (movie.episodes || []).filter(
-    (sv) =>
-      sv.server_data?.some(
-        (ep) => ep.link_m3u8 || ep.link_embed
-      )
+  // --- 2. TÍNH TOÁN SERVER VÀ TẬP PHIM (Đặt ở ngoài useEffect để tránh lỗi null) ---
+  const servers = (movie?.episodes || []).filter(
+    (sv) => sv.server_data?.some((ep) => ep.link_m3u8 || ep.link_embed)
   );
-
   const server = servers[currentServer] || {};
   const episodes = server.server_data || [];
-
   const currentEpisode =
-    episodes.find(
-      (ep) =>
-        ep.slug === episodeSlug &&
-        (ep.link_m3u8 || ep.link_embed)
-    ) ||
+    episodes.find((ep) => ep.slug === episodeSlug && (ep.link_m3u8 || ep.link_embed)) ||
     episodes.find((ep) => ep.link_m3u8 || ep.link_embed) ||
     null;
 
-  console.log("EP:", currentEpisode);
+  // --- 3. GỌI HÀM LƯU LỊCH SỬ (Đúng vị trí) ---
+  useEffect(() => {
+    // Chỉ lưu khi ĐÃ tải xong phim và ĐÃ tìm thấy tập phim
+    if (!loading && movie && currentEpisode) {
+      const historyData = {
+        _id: movie._id,
+        name: movie.name,
+        origin_name: movie.origin_name,
+        poster_url: movie.poster_url,
+        slug: slug,
+        episode_name: currentEpisode.name,
+        episode_slug: episodeSlug || currentEpisode.slug,
+      };
+      
+      // Sử dụng setTimeout để đảm bảo việc lưu không chặn tiến trình render trang
+      const timer = setTimeout(() => {
+        addToHistory(historyData);
+      }, 1000); 
 
-  const playerUrl =
-    currentEpisode?.link_embed || currentEpisode?.link_m3u8;
+      return () => clearTimeout(timer);
+    }
+  }, [loading, movie, currentEpisode, slug, episodeSlug]); // Chỉ chạy khi các biến này thay đổi
 
-    const handleNextEpisode = () => {
-  const currentIndex = episodes.findIndex(
-    ep => ep.slug === currentEpisode?.slug
-  );
+  // --- 4. KIỂM TRA TRẠNG THÁI LOADING/NULL ---
+  if (loading) return <div className="pt-20 text-center text-white">Đang tải phim...</div>;
+  if (!movie) return <div className="pt-20 text-center text-white">Không tìm thấy phim</div>;
 
-  const nextEp = episodes[currentIndex + 1];
-  if (nextEp) {
-    navigate(`/xem/${slug}/${nextEp.slug}`);
-  }
-};
+  // --- 5. LOGIC PLAYER ---
+  const playerUrl = currentEpisode?.link_embed || currentEpisode?.link_m3u8;
+
+  const handleNextEpisode = () => {
+    const currentIndex = episodes.findIndex(ep => ep.slug === currentEpisode?.slug);
+    const nextEp = episodes[currentIndex + 1];
+    if (nextEp) navigate(`/xem/${slug}/${nextEp.slug}`);
+  };
+
+  
 
 
   return (
@@ -135,12 +136,13 @@ export default function Watch() {
         <div className="flex flex-wrap gap-4 mb-8">
           <button
             onClick={() => toggleFavorite(movie)}
-            className={`px-6 py-3 rounded-xl font-medium transition ${isFavorite(movie._id)
-              ? "bg-stalete-500 hover:bg-stalete-600 border border-stalete-700"
-              : "bg-white/10 hover:bg-white/20 border border-white"
+            className={`px-6 py-3 rounded-xl font-medium transition flex items-center gap-2 ${isFavorite(movie._id)
+                ? "bg-red-500/20 hover:bg-red-500/30 border border-red-500 text-red-500"
+                : "bg-white/10 hover:bg-white/20 border border-white text-white"
               }`}
           >
-            {isFavorite(movie._id) ? "❤️" : "🤍"}
+            <span className="text-xl">{isFavorite(movie._id) ? "❤️" : "🤍"}</span>
+            {isFavorite(movie._id) ? "Đã thích" : "Yêu thích"}
           </button>
 
           <Link
@@ -201,29 +203,29 @@ export default function Watch() {
         </div>
 
         {peoples.length > 0 && (
-  <div className="mt-16 border-t border-white/10 pt-10">
-    <h2 className="text-xl font-semibold mb-4">Diễn viên</h2>
+          <div className="mt-16 border-t border-white/10 pt-10">
+            <h2 className="text-xl font-semibold mb-4">Diễn viên</h2>
 
-    <div className="flex gap-6 overflow-x-auto">
-      {peoples.slice(0, 10).map(p => (
-        <div key={p.tmdb_people_id} className="min-w-[100px] text-center">
-          <img
-            src={
-              p.profile_path
-                ? `https://image.tmdb.org/t/p/w185${p.profile_path}`
-                : noImage
-            }
-            className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
-          />
-          <p className="text-xs">{p.name}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+            <div className="flex gap-6 overflow-x-auto">
+              {peoples.slice(0, 10).map(p => (
+                <div key={p.tmdb_people_id} className="min-w-[100px] text-center">
+                  <img
+                    src={
+                      p.profile_path
+                        ? `https://image.tmdb.org/t/p/w185${p.profile_path}`
+                        : noImage
+                    }
+                    className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
+                  />
+                  <p className="text-xs">{p.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
 
-        
+
 
 
       </div>
