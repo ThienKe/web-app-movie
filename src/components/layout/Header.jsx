@@ -95,7 +95,10 @@ const Header = () => {
           </div>
 
           <Link to="/yeu-thich" className="hidden md:block text-white p-2 hover:bg-white/10 rounded-full"><Heart className="w-5 h-5" /></Link>
-          
+          <Link to="/lich-su" className="hidden md:block text-white p-2 hover:bg-white/10 rounded-full transition relative group">
+      <History className="w-5 h-5" />
+      <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">Lịch sử</span>
+    </Link>
           <button 
             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
             className="md:hidden p-2 text-white"

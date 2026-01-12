@@ -15,7 +15,7 @@ import {
 import { getImageUrl } from "../utils/getImageUrl";
 import noImage from "../assets/no-image.jpg";
 import.meta.env.VITE_TMDB_KEY
-
+import Comments from '../components/common/Comments';
 
 const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
 const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
@@ -306,7 +306,7 @@ export default function MovieDetail() {
               </p>
             </section>
 
-
+            <Comments movieId={movie.slug} movieName={movie.name} />
 
           </div>
         </div>

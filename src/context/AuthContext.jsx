@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth, db } from "../firebase";
+import { auth, rtdb } from "../firebase";
 import { 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         // Lấy thêm thông tin role từ Database nếu cần
-        const userRef = ref(db, `users/${firebaseUser.uid}`);
+        const userRef = ref(rtdb, `users/${firebaseUser.uid}`);
         const snapshot = await get(userRef);
         const userData = snapshot.exists() ? snapshot.val() : {};
 
@@ -91,7 +91,7 @@ useEffect(() => {
 
       // Nếu identifier không phải email, đi tìm email theo username
       if (!identifier.includes("@")) {
-        const userQuery = query(ref(db, "users"), orderByChild("username"), equalTo(identifier));
+        const userQuery = query(ref(rtdb, "users"), orderByChild("username"), equalTo(identifier));
         const snapshot = await get(userQuery);
         if (!snapshot.exists()) throw new Error("Tên người dùng không tồn tại");
         

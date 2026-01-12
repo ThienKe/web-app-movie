@@ -1,5 +1,5 @@
 import { ref, set, onValue } from "firebase/database";
-import { db } from "../firebase";
+import { rtdb } from "../firebase";
 import { useAuth } from "./useAuth";
 import { useState, useEffect } from "react";
 
@@ -10,7 +10,7 @@ export const useHistory = () => {
   // Lấy dữ liệu lịch sử về để hiển thị ở trang History.jsx
   useEffect(() => {
     if (!user) return;
-    const historyRef = ref(db, `users/${user.uid}/history`);
+    const historyRef = ref(rtdb, `users/${user.uid}/history`);
     const unsubscribe = onValue(historyRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -29,7 +29,7 @@ export const useHistory = () => {
     if (!user || !movie) return;
 
     // Đường dẫn: users/[uid]/history/[movie_id]
-    const historyRef = ref(db, `users/${user.uid}/history/${movie._id || movie.slug}`);
+    const historyRef = ref(rtdb, `users/${user.uid}/history/${movie._id || movie.slug}`);
 
     try {
       await set(historyRef, {

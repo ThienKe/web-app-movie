@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import MovieCard from "../components/movie/MovieCard";
 import { useAuth } from "../hooks/useAuth";
 import { ref, onValue } from "firebase/database";
-import { db } from "../firebase";
+import { rtdb } from "../firebase";
 
 export default function History() {
   const [history, setHistory] = useState([]);
@@ -13,7 +13,7 @@ export default function History() {
   useEffect(() => {
     if (!user) return;
 
-    const historyRef = ref(db, `users/${user.uid}/history`);
+    const historyRef = ref(rtdb, `users/${user.uid}/history`);
     
     // Lắng nghe dữ liệu thời gian thực
     const unsubscribe = onValue(historyRef, (snapshot) => {

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { ref, get, set, query, orderByChild, equalTo} from "firebase/database";
-import { auth, db } from "../firebase";
+import { auth, rtdb } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 export const useAuth = () => {
@@ -25,7 +25,7 @@ export const useAuth = () => {
       const result = await signInWithPopup(auth, provider);
       const { uid, email, displayName } = result.user;
 
-      const roleSnap = await get(ref(db, `users/${uid}/role`));
+      const roleSnap = await get(ref(rtdb, `users/${uid}/role`));
       const role = roleSnap.exists() ? roleSnap.val() : "user";
 
       const userData = { uid, email, displayName, role };
@@ -46,7 +46,7 @@ const loginWithEmail = async (identifier, password) => {
 
     // 1. Kiểm tra nếu identifier không phải là email (tức là nhập username)
     if (!identifier.includes("@")) {
-      const usersRef = ref(db, "users");
+      const usersRef = ref(rtdb, "users");
       // Tìm user có username khớp với identifier
       const userQuery = query(usersRef, orderByChild("username"), equalTo(identifier));
       const snapshot = await get(userQuery);
@@ -64,7 +64,7 @@ const loginWithEmail = async (identifier, password) => {
     const user = result.user;
 
     // 3. Lấy thêm thông tin role từ database
-    const roleSnap = await get(ref(db, `users/${user.uid}/role`));
+    const roleSnap = await get(ref(rtdb, `users/${user.uid}/role`));
     const role = roleSnap.exists() ? roleSnap.val() : "user";
 
     const userData = {

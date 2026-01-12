@@ -37,18 +37,10 @@ export default function App() {
           <Route path="/xem/:slug" element={<Watch />} />
           <Route path="/xem/:slug/:episodeSlug" element={<Watch />} />
           <Route path="/tim-kiem" element={<SearchPage />} />
-
+          <Route path="/yeu-thich" element={<PrivateRoute><Favorites /></PrivateRoute>} />
+          <Route path="/lich-su" element={<PrivateRoute><History /></PrivateRoute>} />
           {/* --- CÁC ROUTE CẦN ĐĂNG NHẬP (PRIVATE) --- */}
-          <Route
-            path="/yeu-thich"
-            element={
-              <PrivateRoute>
-                <Favorites />
-              </PrivateRoute>
-            }
-          />
-          
-          <Route path="/lich-su" element={<History />} />
+        
 
           {/* Route dành riêng cho Admin */}
           <Route

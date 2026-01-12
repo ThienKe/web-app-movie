@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
-
+import { getFirestore } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: "AIzaSyC4lErq3P7YaKrqZWdlW_God9Atg_GtWqk",
   authDomain: "phim-cu-dem.firebaseapp.com",
@@ -19,5 +19,6 @@ const app = initializeApp(firebaseConfig);
 
 // Export các service cần thiết
 export const auth = getAuth(app);
-export const db = getDatabase(app);
-export { app }; // Export app để giải quyết lỗi "does not provide an export named 'app'"
+export const rtdb = getDatabase(app);
+export const db = getFirestore(app);
+export { app };

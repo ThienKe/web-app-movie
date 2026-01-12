@@ -1,15 +1,21 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthContext } from "../context/AuthContext";
 
 export const PrivateRoute = ({ children, role }) => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthContext();
 
-  // Nếu đang loading thì hiện màn hình đen hoặc trống, không được Navigate ngay
-  if (loading) return <div className="bg-black min-h-screen"></div>;
+  // QUAN TRỌNG: Phải đợi xác thực xong mới quyết định có chuyển hướng hay không
+  if (loading) {
+    return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">Đang xác thực...</div>;
+  }
 
-  if (!user) return <Navigate to="/dang-nhap" />;
+  if (!user) {
+    return <Navigate to="/dang-nhap" />;
+  }
 
-  if (role === "admin" && user.role !== "admin") return <Navigate to="/" />;
+  if (role === 'admin' && user.role !== 'admin') {
+    return <Navigate to="/" />;
+  }
 
   return children;
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { auth, db } from "../firebase";
+import { auth, rtdb } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { Mail, Lock, User, Loader2 } from "lucide-react";
@@ -40,7 +40,7 @@ export default function SignUp() {
       await updateProfile(user, { displayName: username });
 
       // 3. Lưu vào Database
-      await set(ref(db, `users/${user.uid}`), {
+      await set(ref(rtdb, `users/${user.uid}`), {
         uid: user.uid,
         username: username, // Lưu để sau này Login tìm kiếm
         email: email,

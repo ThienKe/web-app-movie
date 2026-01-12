@@ -10,34 +10,40 @@ gsap.registerPlugin(ScrollTrigger);
 export default function MovieSection({ title, movies }) {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
+useGSAP(
+  () => {
+    if (!movies?.length) return;
 
-  useGSAP(
-    () => {
-      if (!movies?.length) return;
-
-      gsap.fromTo(
-        cardsRef.current,
-        {
-          y: 40,
-          opacity: 0
+    gsap.fromTo(
+      cardsRef.current,
+      {
+        y: 20,             // Nảy nhẹ từ dưới
+        opacity: 0,
+        scale: 0.9,        // Phóng từ nhỏ đến lớn
+        filter: "blur(5px)", // Trạng thái ban đầu bị mờ (quan trọng để mượt)
+      },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        filter: "blur(0px)",  // Rõ nét dần
+        duration: 0.8,        // Tăng lên 0.8s để chuyển động có chiều sâu
+        ease: "expo.out",     // Kiểu mượt nhất của GSAP, không bị khựng
+        stagger: {
+          amount: 0.4,        // Tổng thời gian tỏa ra là 0.4s
+          from: "center",     // Tỏa từ trung tâm
+          ease: "power2.inOut"
         },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          ease: "power3.out",
-          stagger: 0.05,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 85%",
-            once: true
-          }
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 90%",
+          once: true
         }
-      );
-
-    },
-    { scope: sectionRef, dependencies: [movies] }
-  );
+      }
+    );
+  },
+  { scope: sectionRef, dependencies: [movies] }
+);
 
   if (!movies?.length) return null;
 

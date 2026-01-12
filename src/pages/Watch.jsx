@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getMovieDetail } from "../services/api";
 import { useFavorites } from "../hooks/useFavorites";
 import { useNavigate } from "react-router-dom";
 import HlsPlayer from "../components/player/HlsPlayer";
-import { getMoviePeoples } from "../services/api";
 import { useHistory } from "../hooks/useHistory";
-
+import Comments from '../components/common/Comments';
+import ReactSlider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { getMovieDetail, getMoviePeoples, getMovieImages, getCastFromTMDB } from "../services/api";
+const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
+const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
+const TMDB_BASE_URL = "https://image.tmdb.org/t/p/w185";
 
 export default function Watch() {
   const { slug, episodeSlug } = useParams();
@@ -15,32 +20,90 @@ export default function Watch() {
   const [loading, setLoading] = useState(true);
   const [currentServer, setCurrentServer] = useState(0);
   const navigate = useNavigate();
-  const [peoples, setPeoples] = useState(null);
+  const [peoples, setPeoples] = useState([]);
   const { addToHistory } = useHistory();
+  const [images, setImages] = useState([]);
 
   // --- 1. FETCH DỮ LIỆU PHIM ---
-  useEffect(() => {
-    let mounted = true;
-    const fetchDetail = async () => {
-      setLoading(true); // Reset loading khi đổi slug phim
-      try {
-        const [movieData, peoplesData] = await Promise.all([
-          getMovieDetail(slug),
-          getMoviePeoples(slug),
-        ]);
-        if (!mounted) return;
-        setMovie(movieData);
-        setPeoples(peoplesData?.data?.peoples || []);
-      } catch (err) {
-        console.error("Fetch movie error:", err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    fetchDetail();
-    return () => (mounted = false);
-  }, [slug]);
 
+useEffect(() => {
+  let mounted = true;
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      // 1. Lấy dữ liệu chi tiết phim trước để lấy TMDB ID
+      const detailData = await getMovieDetail(slug);
+      if (!mounted) return;
+      setMovie(detailData);
+
+      const tmdbId = detailData?.tmdb?.id;
+      const movieType = detailData?.type;
+
+      // 2. Gọi song song: Diễn viên (từ TMDB) và Hình ảnh (từ API riêng)
+      const [castData, imageData] = await Promise.all([
+        tmdbId ? getCastFromTMDB(tmdbId, movieType).catch(() => ({ cast: [] })) : null,
+        getMovieImages(slug).catch(() => ({ images: [] }))
+      ]);
+
+      if (!mounted) return;
+
+      // 3. SET HÌNH ẢNH (Giống hệt MovieDetail)
+      setImages(imageData?.images || []);
+
+      // 4. SET DIỄN VIÊN (Logic giống hệt MovieDetail)
+      let finalCast = [];
+      if (castData?.cast?.length > 0) {
+        finalCast = castData.cast.slice(0, 15).map(p => ({
+          name: p.name,
+          character: p.character || "Diễn viên",
+          image: p.profile_path ? `https://image.tmdb.org/t/p/w185${p.profile_path}` : USER_PLACEHOLDER
+        }));
+      } else if (detailData?.actor) {
+        finalCast = detailData.actor.map(name => ({
+          name: name,
+          character: "Diễn viên",
+          image: USER_PLACEHOLDER
+        }));
+      }
+      setPeoples(finalCast);
+
+    } catch (err) {
+      console.error("Lỗi fetch trang Watch:", err);
+    } finally {
+      if (mounted) setLoading(false);
+    }
+  };
+
+  fetchAllData();
+  return () => { mounted = false; };
+}, [slug]);
+const backdropImages = images?.filter(img => img.type === 'backdrop') || [];
+  const sliderSettings = {
+  dots: false,
+  infinite: backdropImages.length > 3,
+  speed: 500,
+  // Đảm bảo slidesToShow không bao giờ bằng 0
+  slidesToShow: Math.max(1, Math.min(3, backdropImages.length)),
+  slidesToScroll: 1,
+  arrows: true,
+  responsive: [
+    { breakpoint: 1024, settings: { slidesToShow: 2 } },
+    { breakpoint: 600, settings: { slidesToShow: 1 } }
+  ]
+};
+
+const castSettings = {
+  dots: false,
+  infinite: (peoples?.length || 0) > 5,
+  speed: 500,
+  slidesToShow: Math.max(1, Math.min(6, peoples?.length || 1)),
+  slidesToScroll: 2,
+  arrows: true,
+  responsive: [
+    { breakpoint: 1024, settings: { slidesToShow: 4 } },
+    { breakpoint: 600, settings: { slidesToShow: 3 } }
+  ]
+};
   // --- 2. TÍNH TOÁN SERVER VÀ TẬP PHIM (Đặt ở ngoài useEffect để tránh lỗi null) ---
   const servers = (movie?.episodes || []).filter(
     (sv) => sv.server_data?.some((ep) => ep.link_m3u8 || ep.link_embed)
@@ -65,11 +128,11 @@ export default function Watch() {
         episode_name: currentEpisode.name,
         episode_slug: episodeSlug || currentEpisode.slug,
       };
-      
+
       // Sử dụng setTimeout để đảm bảo việc lưu không chặn tiến trình render trang
       const timer = setTimeout(() => {
         addToHistory(historyData);
-      }, 1000); 
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
@@ -88,7 +151,7 @@ export default function Watch() {
     if (nextEp) navigate(`/xem/${slug}/${nextEp.slug}`);
   };
 
-  
+
 
 
   return (
@@ -137,8 +200,8 @@ export default function Watch() {
           <button
             onClick={() => toggleFavorite(movie)}
             className={`px-6 py-3 rounded-xl font-medium transition flex items-center gap-2 ${isFavorite(movie._id)
-                ? "bg-red-500/20 hover:bg-red-500/30 border border-red-500 text-red-500"
-                : "bg-white/10 hover:bg-white/20 border border-white text-white"
+              ? "bg-red-500/20 hover:bg-red-500/30 border border-red-500 text-red-500"
+              : "bg-white/10 hover:bg-white/20 border border-white text-white"
               }`}
           >
             <span className="text-xl">{isFavorite(movie._id) ? "❤️" : "🤍"}</span>
@@ -202,31 +265,59 @@ export default function Watch() {
           <p><b>Chất lượng:</b> {movie.quality} • {movie.lang}</p>
         </div>
 
-        {peoples.length > 0 && (
-          <div className="mt-16 border-t border-white/10 pt-10">
-            <h2 className="text-xl font-semibold mb-4">Diễn viên</h2>
 
-            <div className="flex gap-6 overflow-x-auto">
-              {peoples.slice(0, 10).map(p => (
-                <div key={p.tmdb_people_id} className="min-w-[100px] text-center">
-                  <img
-                    src={
-                      p.profile_path
-                        ? `https://image.tmdb.org/t/p/w185${p.profile_path}`
-                        : noImage
-                    }
-                    className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
-                  />
-                  <p className="text-xs">{p.name}</p>
-                </div>
-              ))}
+        
+          {/* --- PHẦN DIỄN VIÊN --- */}
+{peoples && peoples.length > 0 && (
+  <section className="cast-slider mt-10">
+    <h3 className="text-lg font-bold mb-6 border-l-4 border-purple-600 pl-3 uppercase">Diễn viên</h3>
+    <div className="px-2">
+      <Slider {...castSettings}>
+        {peoples.map((p, i) => (
+          <div key={i} className="text-center px-2 outline-none">
+            <div className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-3 rounded-full overflow-hidden border-2 border-gray-800 bg-gray-900 shadow-lg group">
+              <img
+                src={p.image}
+                alt={p.name}
+                className={`w-full h-full ${p.image.includes('glyphicons') ? 'object-contain p-4' : 'object-cover'} group-hover:scale-110 transition duration-300`}
+                onError={(e) => { e.target.src = USER_PLACEHOLDER; }}
+              />
+            </div>
+            <p className="text-[11px] font-bold line-clamp-1 text-gray-200">{p.name}</p>
+            <p className="text-[9px] text-gray-500 line-clamp-1">{p.character}</p>
+          </div>
+        ))}
+      </Slider>
+    </div>
+  </section>
+)}
+
+{/* --- SLIDER HÌNH ẢNH PHIM --- */}
+{backdropImages.length > 0 && (
+  <section className="movie-image-slider mt-12">
+    <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+      <span className="w-1.5 h-6 bg-purple-600 rounded-full"></span> HÌNH ẢNH PHIM
+    </h3>
+    <div className="px-4">
+      <Slider {...sliderSettings}>
+        {backdropImages.map((img, i) => (
+          <div key={i} className="px-2 outline-none">
+            <div className="rounded-xl overflow-hidden aspect-video border border-white/10 group bg-gray-900 shadow-lg">
+              <img
+                src={`https://image.tmdb.org/t/p/w780${img.file_path}`}
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                alt="Scene"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
             </div>
           </div>
-        )}
+        ))}
+      </Slider>
+    </div>
+  </section>
+)}
 
-
-
-
+<Comments movieId={movie.slug} movieName={movie.name} />
 
       </div>
     </div>

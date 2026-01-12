@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import MovieCard from "../components/movie/MovieCard";
 import { useAuth } from "../hooks/useAuth";
 import { ref, onValue } from "firebase/database";
-import { db } from "../firebase";
+import {rtdb } from "../firebase";
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState([]);
@@ -13,7 +13,7 @@ export default function Favorites() {
     if (!user) return;
 
     // Trỏ vào đúng node favorites của user trên Firebase
-    const favRef = ref(db, `users/${user.uid}/favorites`);
+    const favRef = ref(rtdb, `users/${user.uid}/favorites`);
 
     const unsubscribe = onValue(favRef, (snapshot) => {
       const data = snapshot.val();

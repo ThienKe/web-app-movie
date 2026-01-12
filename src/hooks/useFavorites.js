@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ref, onValue, set, remove, get } from "firebase/database";
-import { db } from "../firebase"; // Đảm bảo đường dẫn này đúng với file config của bạn
+import { rtdb } from "../firebase"; // Đảm bảo đường dẫn này đúng với file config của bạn
 import { useAuth } from "./useAuth";
 
 export const useFavorites = () => {
@@ -14,7 +14,7 @@ export const useFavorites = () => {
       return;
     }
 
-    const favRef = ref(db, `users/${user.uid}/favorites`);
+    const favRef = ref(rtdb, `users/${user.uid}/favorites`);
     const unsubscribe = onValue(favRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -36,7 +36,7 @@ export const useFavorites = () => {
     }
 
     const movieKey = movie._id || movie.slug;
-    const favRef = ref(db, `users/${user.uid}/favorites/${movieKey}`);
+    const favRef = ref(rtdb, `users/${user.uid}/favorites/${movieKey}`);
 
     try {
       const snapshot = await get(favRef);

@@ -4,7 +4,7 @@ import { useAuthContext } from "../context/AuthContext";
 import { User as UserIcon, Lock, Loader2 } from "lucide-react";
 import { useRef } from "react";
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
-import { db } from "../firebase"; 
+import { rtdb } from "../firebase"; 
 export default function Login() {
     const { loginWithGoogle, loginWithEmail } = useAuthContext();
     const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function Login() {
         } 
         // TRƯỜNG HỢP 2: Người dùng nhập Username
         else {
-            const usersRef = ref(db, "users");
+            const usersRef = ref(rtdb, "users");
             const userQuery = query(usersRef, orderByChild("username"), equalTo(identifier));
             const snapshot = await get(userQuery);
 

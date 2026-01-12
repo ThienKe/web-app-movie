@@ -17,7 +17,7 @@
 }/* Custom Slick Arrows */
 .image-movie-slider .slick-prev:before, 
 .image-movie-slider .slick-next:before {
-    color: #3b82f6; /* Màu xanh blue */
+    color: #2a3f61; /* Màu xanh blue */
     font-size: 30px;
     opacity: 0.8;
 }
@@ -36,7 +36,7 @@
     display: none;
 }
 .slick-prev:before, .slick-next:before {
-  color: #3b82f6 !important;
+  color: #2a3f61 !important;
   font-size: 24px !important;
 }
 .slick-prev { left: -30px !important; z-index: 10; }
@@ -55,4 +55,8 @@
 /* Đảm bảo phần trailer iframe không bị ảnh hưởng bởi transform của cha */
 iframe {
     transform: translateZ(0);
+}
+
+.slick-prev:before, .slick-next:before {
+  color: #2a3f61 !important; /* Màu tím giống border của bạn */
 }
