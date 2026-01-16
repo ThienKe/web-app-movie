@@ -17,17 +17,19 @@ export default function MovieCard({ movie, large = false }) {
           }`}
       >
        <img
-          src={imageUrl}
-          alt={movie.name || movie.origin_name}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.06] will-change-transform"
-          // Khi lỗi, chỉ đơn giản là set state thành true
-          onError={() => setImgError(true)}
-        />
+  src={imageUrl}
+  alt={movie.name || movie.origin_name}
+  loading="lazy"
+  decoding="async"
+  className={`w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.06] will-change-transform ${
+    imgError ? "opacity-0" : "opacity-100" // Ẩn ảnh nếu lỗi để lộ nền tối của div cha
+  }`}
+  // Khi lỗi, chỉ đơn giản là set state thành true
+  onError={() => setImgError(true)}
+/>
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300" />
-
+<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         {/* Top badges */}
         <div className="absolute top-2 left-2 right-2 flex justify-between text-xs font-semibold pointer-events-none">
           {movie.lang && (

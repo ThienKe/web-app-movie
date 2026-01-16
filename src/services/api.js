@@ -11,7 +11,7 @@ const TMDB_KEY = import.meta.env.VITE_TMDB_KEY;
 const TMDB_BASE = "https://api.themoviedb.org/3";
 export const getHomeData = async () => {
   const response = await api.get("/home");
-  return response.data.data;s
+  return response.data.data;
 };
 
 export const getCategori = async (slug, page = 1) => {
@@ -38,12 +38,15 @@ export const getPhimChieuRap = async (page = 1) => {
   return response.data.data; 
 };
 
+export const getPhimMoi = async (page = 1) => {
+  const response = await api.get(`/danh-sach/phim-moi?page=${page}`);
+  return response.data.data; 
+};
+
 export const getMovieDetail = async (slug) => {
   const response = await api.get(`/phim/${slug}`);
-  if (response.data.status === "success") {
-    return response.data.data.item; 
-  }
-  throw new Error("Phim không tồn tại");
+  // Trả về thẳng .item để các component MovieDetail/Watch dùng được luôn
+  return response.data.data.item; 
 };
 
 
@@ -120,5 +123,22 @@ export const searchMovies = async (keyword, page = 1) => {
   } catch (error) {
     console.error("Lỗi gọi API:", error);
     return [];
+  }
+};
+
+export const getListMoviesFilter = async (slug, page = 1, filters = {}) => {
+  try {
+    const response = await api.get(`/danh-sach/${slug}`, {
+      params: {
+        page: page,
+        limit: 24, // Bạn có thể chỉnh limit tùy ý
+        ...filters // Chứa category, country, year nếu API hỗ trợ
+      }
+    });
+    // Trả về cả dữ liệu phim và phân trang để logic tốt hơn
+    return response.data.data; 
+  } catch (error) {
+    console.error("Lỗi API:", error);
+    return { items: [], params: { pagination: {} } };
   }
 };

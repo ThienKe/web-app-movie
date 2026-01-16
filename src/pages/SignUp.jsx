@@ -126,7 +126,7 @@ export default function SignUp() {
 
           <button
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-800 p-3 rounded-xl font-bold transition shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
+            className="bg-red-600 hover:bg-red-800 p-3 rounded-xl font-bold transition shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="animate-spin h-5 w-5" /> : "ĐĂNG KÝ NGAY"}
           </button>
@@ -134,7 +134,7 @@ export default function SignUp() {
 
         <p className="mt-8 text-center text-gray-400 text-sm">
           Đã có tài khoản?{" "}
-          <Link to="/dang-nhap" className="text-white font-bold hover:text-blue-600 transition">
+          <Link to="/dang-nhap" className="text-white font-bold hover:text-red-600 transition">
             Đăng nhập
           </Link>
         </p>

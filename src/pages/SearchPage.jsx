@@ -26,10 +26,10 @@ export default function SearchPage() {
     const fetchSearch = async () => {
       setLoading(true);
       try {
-        console.log(`Đang tìm kiếm với keyword: ${keyword}, trang: ${page}`);
+        
         const items = await searchMovies(keyword, page);
         
-        console.log("Kết quả nhận được từ hàm searchMovies:", items);
+        
 
         if (!items || items.length === 0) {
           setHasMore(false);
@@ -40,7 +40,7 @@ export default function SearchPage() {
           setHasMore(items.length >= 20);
         }
       } catch (err) {
-        console.error("Lỗi tại SearchPage:", err);
+        
       } finally {
         setLoading(false);
       }
@@ -51,8 +51,8 @@ export default function SearchPage() {
 
   return (
     <div className="pt-24 min-h-screen text-white px-4 md:px-8 max-w-[1400px] mx-auto">
-      <h1 className="text-2xl font-semibold mb-8 uppercase tracking-wider border-l-4 border-red-600 pl-4">
-        Kết quả cho: <span className="text-red-500">"{keyword}"</span>
+      <h1 className="text-2xl font-semibold mb-8  pl-4">
+        Kết quả cho: <span className="text-white font-semibold">"{keyword}"</span>
       </h1>
 
       {loading && movies.length === 0 ? (
@@ -71,28 +71,34 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Pagination */}
-      {movies.length > 0 && (
-        <div className="mt-12 flex justify-center gap-4 pb-10">
+      {/* ===== PAGINATION ===== */}
+        <div className="mt-12 flex justify-end items-center space-x-3">
           <button
-            onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo(0, 0); }}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-6 py-2 bg-slate-800 rounded-lg disabled:opacity-30 hover:bg-red-600 transition"
+            className="bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
           >
-            Trang trước
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+            Trước
           </button>
-          <span className="flex items-center font-bold px-4 bg-red-600/20 rounded-lg text-red-500 border border-red-600/30">
-            {page}
+
+          <span className="bg-white/10 px-5 py-3 rounded-xl">
+            Trang {page}
           </span>
+
           <button
-            onClick={() => { setPage(p => p + 1); window.scrollTo(0, 0); }}
+            onClick={() => setPage(p => p + 1)}
             disabled={!hasMore}
-            className="px-6 py-2 bg-slate-800 rounded-lg disabled:opacity-30 hover:bg-red-600 transition"
+            className="bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
           >
-            Trang sau
+            Sau
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
           </button>
         </div>
-      )}
     </div>
   );
 }

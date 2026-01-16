@@ -4,7 +4,7 @@ import { Facebook, Twitter, Instagram, MessageCircle } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 border-t border-white/10 mt-20 py-12 text-white">
+    <footer className="bg-black/55 border-t border-white/10 mt-20 py-12 text-white">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         <div className="grid md:grid-cols-3 gap-10">
           {/* Bên trái: Logo link to Trang Chủ + Description */}
@@ -31,18 +31,13 @@ export default function Footer() {
           <div className="flex flex-col items-start md:items-end">
             <h3 className="text-xl font-semibold mb-4">Theo dõi chúng tôi</h3>
             <div className="flex space-x-4">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-white/10 rounded-full transition">
+              <a href="https://www.facebook.com/keeslt/" target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-white/10 rounded-full transition">
                 <Facebook className="w-6 h-6" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-white/10 rounded-full transition">
-                <Twitter className="w-6 h-6" />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-white/10 rounded-full transition">
+              <a href="https://www.instagram.com/ekneiht.06/" target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-white/10 rounded-full transition">
                 <Instagram className="w-6 h-6" />
               </a>
-              <a href="https://t.me" target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-white/10 rounded-full transition">
-                <MessageCircle className="w-6 h-6" />
-              </a>
+              
             </div>
           </div>
         </div>

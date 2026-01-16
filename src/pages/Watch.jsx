@@ -9,6 +9,8 @@ import ReactSlider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { getMovieDetail, getMoviePeoples, getMovieImages, getCastFromTMDB } from "../services/api";
+import RelatedMovies from '../components/movie/RelatedMovies';
+
 const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
 const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
 const TMDB_BASE_URL = "https://image.tmdb.org/t/p/w185";
@@ -139,7 +141,10 @@ const castSettings = {
   }, [loading, movie, currentEpisode, slug, episodeSlug]); // Chỉ chạy khi các biến này thay đổi
 
   // --- 4. KIỂM TRA TRẠNG THÁI LOADING/NULL ---
-  if (loading) return <div className="pt-20 text-center text-white">Đang tải phim...</div>;
+  if (loading) return <div className="pt-20 min-h-screen  text-white flex items-center justify-center">
+                <div className="loader"></div>
+
+      </div>
   if (!movie) return <div className="pt-20 text-center text-white">Không tìm thấy phim</div>;
 
   // --- 5. LOGIC PLAYER ---
@@ -200,17 +205,17 @@ const castSettings = {
           <button
             onClick={() => toggleFavorite(movie)}
             className={`px-6 py-3 rounded-xl font-medium transition flex items-center gap-2 ${isFavorite(movie._id)
-              ? "bg-red-500/20 hover:bg-red-500/30 border border-red-500 text-red-500"
-              : "bg-white/10 hover:bg-white/20 border border-white text-white"
+              ? "bg-red-500/20 hover:bg-red-900/30 border border-red-500 text-red-500"
+              : "bg-white/10 hover:bg-red-900 border border-white text-white"
               }`}
           >
-            <span className="text-xl">{isFavorite(movie._id) ? "❤️" : "🤍"}</span>
+            <span className="text-xl">{isFavorite(movie._id) ? "" : ""}</span>
             {isFavorite(movie._id) ? "Đã thích" : "Yêu thích"}
           </button>
 
           <Link
             to={`/phim/${slug}`}
-            className="px-6 py-3 rounded-xl bg-stalete-500 hover:bg-stalete-600 border border-stalete-700"
+            className="px-6 py-3 rounded-xl bg-white/10 hover:bg-red-900 border border-stalete-700"
           >
             Chi tiết phim
           </Link>
@@ -226,7 +231,7 @@ const castSettings = {
                 navigate(`/xem/${slug}`);
               }}
               className={`px-5 py-2 rounded-lg transition font-medium ${index === currentServer
-                ? "bg-blue-950 text-white"
+                ? "bg-red-950 text-white"
                 : "bg-white/10 hover:bg-white/20"
                 }`}
             >
@@ -244,7 +249,7 @@ const castSettings = {
                 key={ep.slug}
                 to={`/xem/${slug}/${ep.slug}`}
                 className={`py-2 text-center rounded-lg font-medium ${ep.slug === currentEpisode?.slug
-                  ? "bg-blue-800"
+                  ? "bg-red-800"
                   : "bg-white/10 hover:bg-white/20"
                   }`}
               >
@@ -270,7 +275,7 @@ const castSettings = {
           {/* --- PHẦN DIỄN VIÊN --- */}
 {peoples && peoples.length > 0 && (
   <section className="cast-slider mt-10">
-    <h3 className="text-lg font-bold mb-6 border-l-4 border-purple-600 pl-3 uppercase">Diễn viên</h3>
+    <h3 className="text-lg font-bold mb-6 pl-3 uppercase">Diễn viên</h3>
     <div className="px-2">
       <Slider {...castSettings}>
         {peoples.map((p, i) => (
@@ -296,7 +301,7 @@ const castSettings = {
 {backdropImages.length > 0 && (
   <section className="movie-image-slider mt-12">
     <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-      <span className="w-1.5 h-6 bg-purple-600 rounded-full"></span> HÌNH ẢNH PHIM
+      <span className="w-1.5 h-6 rounded-full"></span> HÌNH ẢNH PHIM
     </h3>
     <div className="px-4">
       <Slider {...sliderSettings}>
@@ -318,7 +323,7 @@ const castSettings = {
 )}
 
 <Comments movieId={movie.slug} movieName={movie.name} />
-
+<RelatedMovies currentMovie={movie} />
       </div>
     </div>
   );
