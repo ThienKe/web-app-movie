@@ -5,8 +5,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { Mail, Lock, User, Loader2 } from "lucide-react";
 import { useRef } from "react";
-import PageMeta from "../components/PageMeta";
-
+import SEO from '../components/SEO';
 export default function SignUp() {
   //const { loginWithEmail, loginWithGoogle } = useAuthContext();
   const navigate = useNavigate();
@@ -61,8 +60,9 @@ export default function SignUp() {
 
   
   return (
+    <>
+    <SEO title="Đăng Ký" description="Tạo tài khoản mới tại Phim Cú Đêm." />
     <div className="min-h-screen flex items-center justify-center bg-opacity-90 bg-[url('/bg-home.jpg')] bg-cover bg-center px-4">
-      <PageMeta title="Đăng Ký Tài Khoản" />
       <div className=" p-8 rounded-2xl w-full max-w-md text-white shadow-2xl backdrop-blur-md border border-white/10">
         <h1 className="text-3xl font-semibold mb-8 text-center uppercase tracking-wider text-white">Đăng ký</h1>
 
@@ -142,5 +142,6 @@ export default function SignUp() {
         </p>
       </div>
     </div>
+    </>
   );
 }

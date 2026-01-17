@@ -3,18 +3,13 @@ import MovieCard from "../components/movie/MovieCard";
 import { useAuth } from "../hooks/useAuth";
 import { ref, onValue } from "firebase/database";
 import {rtdb } from "../firebase";
-import PageMeta from "../components/PageMeta";
-
+import SEO from '../components/SEO';
+import LoadingView from "../components/LoadingView";
 export default function Favorites() {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  useEffect(() => {
-  document.title = "Phim đã yêu thích - CuDem Movie";
   
-  // Khi rời trang, trả về tên mặc định
-  return () => { document.title = "Phim Cú Đêm - Xem Phim Hay Online Miễn Phí VietSub"; };
-}, []);
   useEffect(() => {
     if (!user) return;
 
@@ -35,11 +30,13 @@ export default function Favorites() {
     return () => unsubscribe();
   }, [user]);
 
-  if (loading) return <div className="pt-20 text-center text-white">Đang tải...</div>;
-
+  if (loading) return <LoadingView />;
+        
   return (
+    <>  
+          <SEO title="Phim Yêu Thích" description="Xem phim yêu thích của bạn tại Phim Cú Đêm." />
+
     <div className="pt-20 min-h-screen text-white">
-      
       <div className="max-w-7xl mx-auto px-4 md:px-10 py-10">
         <h1 className="text-3xl font-semibold mb-8">Phim Yêu Thích</h1>
         {favorites.length === 0 ? (
@@ -55,5 +52,6 @@ export default function Favorites() {
         )}
       </div>
     </div>
+       </> 
   );
 }

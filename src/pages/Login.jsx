@@ -4,7 +4,8 @@ import { useAuthContext } from "../context/AuthContext";
 import { User as UserIcon, Lock, Loader2 } from "lucide-react";
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 import { rtdb } from "../firebase"; 
-
+import SEO from '../components/SEO';
+import { useMemo } from "react";
 export default function Login() {
     const { loginWithGoogle, loginWithEmail } = useAuthContext();
     const navigate = useNavigate();
@@ -15,13 +16,8 @@ export default function Login() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // ĐƯA USEEFFECT RA NGOÀI NÀY (Cấp cao nhất của Component)
-    useEffect(() => {
-        document.title = "Trang Đăng Nhập Tài Khoản - CuDem Movie";
-        return () => { 
-            document.title = "Phim Cú Đêm - Xem Phim Hay Online Miễn Phí VietSub"; 
-        };
-    }, []);
+
+    
 
     const onLoginClick = async (e) => {
         e.preventDefault();
@@ -81,8 +77,10 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center text-white p-4">
-            <div className="p-8 rounded-2xl w-full max-w-md border border-white/10 shadow-2xl backdrop-blur-xl bg-slate-900/50">
+        <>
+<SEO title="Đăng Nhập" description="Đăng nhập tài khoản Phim Cú Đêm." />
+        <div className="min-h-screen flex items-center justify-center bg-opacity-90 bg-[url('/bg-home.jpg')] bg-cover bg-center px-4">
+      <div className=" p-8 rounded-2xl w-full max-w-md text-white shadow-2xl backdrop-blur-md border border-white/10">
                 <h1 className="text-2xl font-semibold mb-8 text-center text-white tracking-widest uppercase">
                     Đăng nhập
                 </h1>
@@ -158,5 +156,6 @@ export default function Login() {
                 </button>
             </div>
         </div>
+        </>
     );
 }

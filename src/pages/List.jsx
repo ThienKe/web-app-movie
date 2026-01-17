@@ -1,207 +1,218 @@
-import { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useLocation, useSearchParams } from "react-router-dom";
 import MovieCard from "../components/movie/MovieCard";
-import { getCountry, getListMovies, getCategori } from "../services/api";
-import ExtraMovieSlider from "../components/section/ExtraMovieSlider.jsx";
-import UpcomingMovieSlider from "../components/section/UpcomingMovieSlider";
 import MovieCardSkeleton from "../components/movie/MovieCardSkeleton";
-import { toTitleCase } from "../utils/formatTitle";
 import MovieFilter from "../components/section/MovieFilter";
-import PageMeta from "../components/PageMeta";
-
+import SEO from "../components/SEO";
+import { getCountry, getListMovies, getCategori } from "../services/api";
+import { getVnName } from "../utils/vnMap.js";
 
 const FILTER_DATA = {
   categories: [
     { name: "Hành Động", slug: "hanh-dong" },
-     { name: "Cổ Trang", slug: "co-trang" }, 
-     { name: "Kinh Dị", slug: "kinh-di" },
-      { name: "Tình Cảm", slug: "tinh-cam" }, 
-      { name: "Hài Hước", slug: "hai-huoc" }, 
-      { name: "Viễn Tưởng", slug: "vien-tuong" }, 
-      { name: "Hoạt Hình", slug: "hoat-hinh" }, 
-      { name: "Phiêu Lưu", slug: "phieu-luu" },
-       { name: "Tâm Lý", slug: "tam-ly" }, 
-       { name: "Chiến Tranh", slug: "chien-tranh" },
-        { name: "Khoa Học Viễn Tưởng", slug: "khoa-hoc-vien-tuong" }, 
-        { name: "Thần Thoại", slug: "than-thoai" }, 
-        { name: "Hình Sự", slug: "hinh-su" },
-         { name: "Lịch Sử", slug: "lich-su" }, 
-         { name: "Âm Nhạc", slug: "am-nhac" },
-          { name: "Tài Liệu", slug: "tai-lieu" }, 
-          { name: "Thể Thao", slug: "the-thao" }, 
-          { name: "Phim 18+", slug: "phim-18" },
+    { name: "Cổ Trang", slug: "co-trang" },
+    { name: "Kinh Dị", slug: "kinh-di" },
+    { name: "Tình Cảm", slug: "tinh-cam" },
+    { name: "Hài Hước", slug: "hai-huoc" },
+    { name: "Viễn Tưởng", slug: "vien-tuong" },
+    { name: "Hoạt Hình", slug: "hoat-hinh" },
+    { name: "Phiêu Lưu", slug: "phieu-luu" },
+    { name: "Tâm Lý", slug: "tam-ly" },
+    { name: "Chiến Tranh", slug: "chien-tranh" },
+    { name: "Khoa Học Viễn Tưởng", slug: "khoa-hoc-vien-tuong" },
+    { name: "Thần Thoại", slug: "than-thoai" },
+    { name: "Hình Sự", slug: "hinh-su" },
+    { name: "Lịch Sử", slug: "lich-su" },
+    { name: "Âm Nhạc", slug: "am-nhac" },
+    { name: "Tài Liệu", slug: "tai-lieu" },
+    { name: "Thể Thao", slug: "the-thao" },
+    { name: "Phim 18+", slug: "phim-18" },
   ],
   countries: [
-    { name: "Hàn Quốc", slug: "han-quoc" }, 
-    { name: "Trung Quốc", slug: "trung-quoc" }, 
-    { name: "Âu Mỹ", slug: "au-my" }, 
-    { name: "Việt Nam", slug: "viet-nam" }, 
+    { name: "Hàn Quốc", slug: "han-quoc" },
+    { name: "Trung Quốc", slug: "trung-quoc" },
+    { name: "Âu Mỹ", slug: "au-my" },
+    { name: "Việt Nam", slug: "viet-nam" },
     { name: "Nhật Bản", slug: "nhat-ban" },
-     { name: "Thái Lan", slug: "thai-lan" }, 
-     { name: "Ấn Độ", slug: "an-do" }, 
-    { name: "Pháp", slug: "phap" }, 
+    { name: "Thái Lan", slug: "thai-lan" },
+    { name: "Ấn Độ", slug: "an-do" },
+    { name: "Pháp", slug: "phap" },
     { name: "Đài Loan", slug: "dai-loan" },
-     { name: "Hồng Kông", slug: "hong-kong" }, 
-     { name: "Anh", slug: "anh" },
-      {name : "Indonesia", slug : "indonesia"},
-      {name : "Malaysia", slug : "malaysia"},
-      { name: "Đức", slug: "duc" }, 
-      { name: "Phần Lan", slug: "phan-lan" }, 
-      { name: "Nga", slug: "nga" }, 
+    { name: "Hồng Kông", slug: "hong-kong" },
+    { name: "Anh", slug: "anh" },
+    { name: "Indonesia", slug: "indonesia" },
+    { name: "Malaysia", slug: "malaysia" },
+    { name: "Đức", slug: "duc" },
+    { name: "Phần Lan", slug: "phan-lan" },
+    { name: "Nga", slug: "nga" },
     { name: "Úc", slug: "uc" }
-
   ],
   years: Array.from({ length: 26 }, (_, i) => 2026 - i)
 };
+
 export default function List() {
   const { slug } = useParams();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const type = location.pathname.split("/")[1];
 
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Lấy params từ URL để lọc kép
-  const queryParams = new URLSearchParams(location.search);
-const countryFilter = queryParams.get("country"); // Đổi từ quoc-gia -> country
-const yearFilter = queryParams.get("year");
-useEffect(() => {
-  if (slug === 'phim-moi') {
-    document.title = "Phim mới nhất - CuDem Movie";
-  } else {
-    // Logic cho các slug khác (phim-le, phim-bo...)
-    document.title = slug.replace(/-/g, ' ') + " - Phim Cú Đêm - Xem Phim Online Miễn Phí VietSub";
-  }
-}, [slug]);
-  /* ===== RESET KHI ĐỔI ROUTE CHÍNH ===== */
-  /* ===== FETCH & FILTER LOGIC ===== */
-useEffect(() => {
-  const fetchMovies = async () => {
-    setLoading(true);
-    try {
-      let responseData;
-      
-      // 1. Lấy dữ liệu gốc từ API theo URL (Slug chính)
-      if (type === "danh-sach") {
-        responseData = await getListMovies(slug, page);
-      } else if (type === "the-loai") {
-        responseData = await getCategori(slug, page);
-      } else if (type === "quoc-gia") {
-        responseData = await getCountry(slug, page);
-      }
+  const page = parseInt(searchParams.get("page")) || 1;
+  const countryFilter = searchParams.get("country");
+  const yearFilter = searchParams.get("year");
+  const categoryFilter = searchParams.get("category");
 
-      // API v1 trả về mảng items trực tiếp từ các hàm service bạn đã viết
-      const items = Array.isArray(responseData) ? responseData : (responseData?.items || []);
+  const displayTitle = useMemo(() => {
+    return slug === 'tat-ca' ? getVnName(type) : getVnName(slug);
+  }, [slug, type]);
 
-      // 2. LOGIC LỌC PHỤ (Client-side filtering)
-      // Lúc này ta lọc dựa trên các tham số phụ trên URL (?country=...&year=...&category=...)
-      let filtered = [...items];
-
-      // Lọc theo Quốc gia (Nếu đang không ở trang quoc-gia)
-      if (countryFilter && type !== "quoc-gia") {
-        filtered = filtered.filter(m => 
-          Array.isArray(m.country) 
-            ? m.country.some(c => c.slug === countryFilter)
-            : m.country?.slug === countryFilter || m.country === countryFilter
-        );
-      }
-
-      // Lọc theo Năm
-      if (yearFilter) {
-        filtered = filtered.filter(m => m.year?.toString() === yearFilter);
-      }
-
-      // Lọc theo Thể loại (Nếu đang không ở trang the-loai)
-      // Lưu ý: Bạn cần lấy thêm categoryFilter từ URLSearchParams
-      const categoryFilter = queryParams.get("category");
-      if (categoryFilter && type !== "the-loai") {
-        filtered = filtered.filter(m => 
-          m.category?.some(cat => cat.slug === categoryFilter)
-        );
-      }
-
-      setMovies(filtered);
-      
-      // Kiểm tra còn phim hay không dựa trên số lượng items gốc của API
-      setHasMore(items.length >= 20); 
-
-    } catch (err) {
-      console.error("Lỗi Fetch:", err);
-      setMovies([]);
-    } finally {
-      setLoading(false);
-    }
+  const handlePageChange = (newPage) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("page", newPage.toString());
+      return newParams;
+    });
   };
 
-  fetchMovies();
-}, [slug, type, page, location.search]);
-  return (
-    <div className="pt-24 min-h-screen text-white">
-      
-      <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 py-10">
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const apiFilters = {
+          ...(countryFilter && { country: countryFilter }),
+          ...(yearFilter && { year: yearFilter }),
+          ...(categoryFilter && { category: categoryFilter }),
+        };
+
+        let responseData;
+        if (type === "danh-sach") {
+          responseData = await getListMovies(slug, page, apiFilters);
+        } else if (type === "the-loai") {
+          responseData = await getCategori(slug, page, apiFilters);
+        } else if (type === "quoc-gia") {
+          responseData = await getCountry(slug, page, apiFilters);
+        }
+
+        const items = responseData?.items || [];
+        const pagination = responseData?.params?.pagination;
         
-        <h1 className="text-2xl md:text-3xl font-semibold mb-10 pl-4 ">
-          {toTitleCase(type.replace(/-/g, ' '))}: {toTitleCase(slug.replace(/-/g, ' '))}
-        </h1>
+        // Tính toán phân trang chính xác
+        const totalItems = Number(pagination?.totalItems) || 0;
+        const itemsPerPage = Number(pagination?.totalItemsPerPage) || 24;
+        const calculatedTotal = Math.ceil(totalItems / itemsPerPage) || 1;
 
-        {/* Component lọc riêng */}
-        <MovieFilter 
-  categories={FILTER_DATA.categories} 
-  countries={FILTER_DATA.countries} 
-  years={FILTER_DATA.years} 
-/>
+        setTotalPages(calculatedTotal);
+        setHasMore(page < calculatedTotal);
+        setMovies(items);
+        
+      } catch (err) {
+        console.error("Lỗi:", err);
+        setMovies([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 md:gap-6">
-            {Array.from({ length: 16 }).map((_, i) => <MovieCardSkeleton key={i} />)}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 md:gap-6">
-            {movies.length > 0 ? (
-              movies.map((movie) => (
-                <div key={movie._id || movie.slug} className="w-full max-w-[190px] mx-auto">
-                  <MovieCard movie={movie} />
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-20 text-gray-500">
-                Không tìm thấy phim phù hợp với bộ lọc này.
-              </div>
-            )}
-          </div>
-        )}
+    fetchMovies();
+  }, [slug, type, page, countryFilter, yearFilter, categoryFilter]);
 
-        {/* ===== PAGINATION ===== */}
-        <div className="mt-12 flex justify-end items-center space-x-3">
-          <button
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-            </svg>
-            Trước
-          </button>
+  return (
+    <>
+      <SEO title={`Danh sách phim ${displayTitle}`} />
+      <div className="pt-24 min-h-screen text-white px-4 md:px-16 lg:px-24 max-w-[1600px] mx-auto">
+      
+      {/* Container Tiêu đề & Bộ lọc: Thêm mb-12 để tạo khoảng cách với các card phim bên dưới */}
+      <div className="flex items-center justify-between mb-12 border-b border-white/5 pb-8">
+        <div className="flex items-center gap-6">
+          <h1 className="text-2xl md:text-3xl flex items-baseline gap-2">
+            <span className="text-gray-400 font-normal text-xl md:text-2xl">Danh sách:</span>
+            <span className="font-semibold text-white tracking-wider">
+              {displayTitle}
+            </span>
+          </h1>
 
-          <span className="bg-white/10 px-5 py-3 rounded-xl">
-            Trang {page}
-          </span>
-
-          <button
-            onClick={() => setPage(p => p + 1)}
-            disabled={!hasMore}
-            className="bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
-          >
-            Sau
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-            </svg>
-          </button>
+          {/* Nút bộ lọc nằm ngay cạnh Title */}
+          <MovieFilter
+            countries={FILTER_DATA.countries}
+            years={FILTER_DATA.years}
+            categories={FILTER_DATA.categories}
+          />
+        </div>
+        
+        {/* Có thể thêm hiển thị tổng số phim hoặc breadcrumb nhỏ ở đây nếu muốn */}
+        <div className="hidden sm:block text-xs text-gray-500 italic">
+          Tổng cộng: {totalPages * 24}+ phim
         </div>
       </div>
-    </div>
+
+        {loading ? (
+          // Grid 8 cột cho Skeleton giống SearchPage
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <MovieCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Grid 8 cột cho Movie Card */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+              {movies.length > 0 ? (
+                movies.map((movie) => (
+                  <MovieCard key={movie._id || movie.slug} movie={movie} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-20 text-gray-500 italic">
+                  Không tìm thấy phim phù hợp với bộ lọc này.
+                </div>
+              )}
+            </div>
+
+            {/* ===== PAGINATION BOX (Sát lề phải) ===== */}
+            {movies.length > 0 && (
+              <div className="mt-16 flex justify-end items-center gap-4 pb-20 border-t border-white/5 pt-10">
+                <div className="text-sm font-medium">
+                  <span className="text-gray-500">Trang</span>{" "}
+                  <span className="text-white">{page}</span>{" "}
+                  <span className="text-gray-600">/</span>{" "}
+                  <span className="text-gray-400">{totalPages.toLocaleString()}</span>
+                </div>
+
+                <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 shadow-2xl">
+                  <button
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1 || loading}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl hover:bg-white/10 text-gray-300 disabled:opacity-20 disabled:cursor-not-allowed transition-all font-semibold"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Trước
+                  </button>
+
+                  <div className="w-[1px] h-8 bg-white/10 self-center"></div>
+
+                  <button
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={!hasMore || loading}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl hover:bg-white/10 text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all font-semibold"
+                  >
+                    Sau
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 }

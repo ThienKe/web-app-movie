@@ -62,13 +62,14 @@ export default function HeroSlider() {
     { scope: containerRef, dependencies: [loading, movies] }
   );
 
-  if (loading || !movies.length) {
-    return (
-      <div className="h-[95vh] flex items-center justify-center bg-black">
-        <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  if (loading) {
+  return (
+    <div className="h-screen flex flex-col items-center justify-center bg-black">
+      <div className="loader"></div>
+      <p className="mt-4 text-gray-400 text-sm tracking-widest uppercase">Phim Cú Đêm</p>
+    </div>
+  );
+}
 
   return (
     <div ref={containerRef} className="relative w-full h-[95vh] -mt-20 overflow-hidden bg-black hero-slider-container">

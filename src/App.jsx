@@ -14,11 +14,14 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import Favorites from "./pages/Favorites";
 import { useAuth } from "./hooks/useAuth";
 import { AuthProvider } from "./context/AuthContext";
-
+import { HelmetProvider } from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 export default function App() {
   
 
   return (
+    <HelmetProvider>
+    
     <AuthProvider>
       <Router>
         <ScrollToTop />
@@ -55,5 +58,6 @@ export default function App() {
       </Routes>
     </Router>
     </AuthProvider>
+    </HelmetProvider>
   );
 }

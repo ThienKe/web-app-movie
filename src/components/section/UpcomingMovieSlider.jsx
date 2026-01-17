@@ -8,16 +8,19 @@ export default function UpcomingMovieSlider() {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const items = await getListMovies("phim-sap-chieu", 1);
-        setMovies(items.slice(0, 20));
-      } catch (e) {
-        console.error("Lỗi fetch phim sắp chiếu:", e);
-      }
-    };
-    fetchData();
-  }, []);
+  const fetchData = async () => {
+    try {
+      const responseData = await getListMovies("phim-sap-chieu", 1);
+      
+      const items = responseData?.items || [];
+      
+      setMovies(items.slice(0, 20));
+    } catch (e) {
+      console.error("Lỗi fetch phim sắp chiếu:", e);
+    }
+  };
+  fetchData();
+}, []);
 
   const scroll = (direction) => {
     if (!containerRef.current) return;

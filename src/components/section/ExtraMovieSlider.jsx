@@ -8,16 +8,20 @@ export default function ExtraMovieSlider() {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const items = await getListMovies("phim-moi", 1);
-        setMovies(items.slice(0, 24));
-      } catch (e) {
-        console.error("Lỗi fetch phim mới:", e);
-      }
-    };
-    fetchData();
-  }, []);
+  const fetchData = async () => {
+    try {
+      const responseData = await getListMovies("phim-moi", 1);
+      
+      // Fix: responseData.items mới là mảng
+      const items = responseData?.items || [];
+      
+      setMovies(items.slice(0, 24));
+    } catch (e) {
+      console.error("Lỗi fetch phim mới:", e);
+    }
+  };
+  fetchData();
+}, []);
 
   const scroll = (direction) => {
     if (!containerRef.current) return;

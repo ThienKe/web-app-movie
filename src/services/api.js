@@ -15,17 +15,23 @@ export const getHomeData = async () => {
 };
 
 export const getCategori = async (slug, page = 1) => {
-  const response = await api.get(`/the-loai/${slug}?page=${page}`);
-  return response.data.data.items || [];
+  const response = await api.get(`/the-loai/${slug}`, {
+    params: { page }
+  });
+  return response.data.data;
 };
 
 export const getCountry = async (slug, page = 1) => {
-  const response = await api.get(`/quoc-gia/${slug}?page=${page}`);
-  return response.data.data.items || [];
+  const response = await api.get(`/quoc-gia/${slug}`, {
+    params: { page }
+  });
+  return response.data.data;
 };
 export const getListMovies = async (slug, page = 1) => {
-  const response = await api.get(`/danh-sach/${slug}?page=${page}`);
-  return response.data.data.items || [];
+  const response = await api.get(`/danh-sach/${slug}`, {
+    params: { page }
+  });
+  return response.data.data;
 };
 
 export const getMovieImages = async (slug) => {

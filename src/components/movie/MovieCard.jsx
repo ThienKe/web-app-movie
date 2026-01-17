@@ -33,12 +33,12 @@ export default function MovieCard({ movie, large = false }) {
         {/* Top badges */}
         <div className="absolute top-2 left-2 right-2 flex justify-between text-xs font-semibold pointer-events-none">
           {movie.lang && (
-            <span className="bg-slate-700/80 backdrop-blur px-2 py-0.5 rounded-md text-white text-[10px] sm:text-xs">
+            <span className="bg-red-700/80 backdrop-blur px-2 py-0.5 rounded-md text-white text-[10px] sm:text-xs">
               {movie.lang}
             </span>
           )}
           {movie.quality && (
-            <span className="bg-slate-800/80 backdrop-blur px-2 py-0.5 rounded-md text-white text-[10px] sm:text-xs">
+            <span className="bg-red-800/80 backdrop-blur px-2 py-0.5 rounded-md text-white text-[10px] sm:text-xs">
               {movie.quality}
             </span>
           )}
@@ -46,7 +46,7 @@ export default function MovieCard({ movie, large = false }) {
 
         {/* Year */}
         {movie.year && (
-          <span className="absolute bottom-2 right-2 bg-slate-900/80 backdrop-blur px-2 py-0.5 text-xs sm:text-[11px] font-semibold rounded-md text-white pointer-events-none">
+          <span className="absolute bottom-2 right-2 bg-red-900/80 backdrop-blur px-2 py-0.5 text-xs sm:text-[11px] font-semibold rounded-md text-white pointer-events-none">
             {movie.year}
           </span>
         )}

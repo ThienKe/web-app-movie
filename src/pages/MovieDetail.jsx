@@ -16,7 +16,7 @@ import { getImageUrl } from "../utils/getImageUrl";
 import noImage from "../assets/no-image.jpg";
 import Comments from '../components/common/Comments';
 import RelatedMovies from '../components/movie/RelatedMovies';
-import PageMeta from "../components/PageMeta";
+import SEO from '../components/SEO';
 const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
 const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
 
@@ -31,10 +31,7 @@ export default function MovieDetail() {
   const [peoples, setPeoples] = useState([]);
   const [images, setImages] = useState([]);
   const TMDB_BASE_URL = "https://image.tmdb.org/t/p/w185";
-  const displayTitle = movie ? `${movie.name} (${movie.year}) - Xem Phim` : "Đang tải thông tin phim...";
-  useEffect(() => {
-    document.title = displayTitle;
-  }, [displayTitle]);
+ 
   useEffect(() => {
     let mounted = true;
     const fetchAllData = async () => {
@@ -95,11 +92,20 @@ export default function MovieDetail() {
     return doc.body.textContent || "";
   };
 
-  if (loading) return <div className="pt-20 min-h-screen  text-white flex items-center justify-center">
-                <div className="loader"></div>
-
+  if (loading) return <div className="h-[50vh] flex flex-col items-center justify-center w-full">
+              <div className="loader mb-4"></div>
+              <p className="text-white animate-pulse text-sm font-medium">Đang tải thông tin phim...</p>
       </div>
-  if (!movie) return <div className="pt-20 text-center text-white min-h-screen">KHÔNG TÌM THẤY PHIM</div>;
+  if (!movie) return (
+  <div className="pt-20 min-h-screen flex flex-col items-center justify-center text-white bg-black">
+    <div className="text-red-600 mb-4 opacity-20">
+       <X size={80} />
+    </div>
+    <h2 className="text-2xl font-bold mb-2">KHÔNG TÌM THẤY PHIM</h2>
+    <p className="text-gray-400 mb-6 text-center px-4">Có vẻ đường dẫn đã bị lỗi hoặc phim đã bị gỡ bỏ.</p>
+    <Link to="/" className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-full transition">Trở về trang chủ</Link>
+  </div>
+);
 
   const sliderSettings = {
     dots: false,
@@ -129,7 +135,12 @@ export default function MovieDetail() {
   };
 
   return (
-    
+     <>
+        <SEO 
+          title={`${movie.name} (${movie.year})`} 
+          description={movie.content?.replace(/<[^>]*>/g, '').substring(0, 160)}
+          movie={movie} 
+        />
     <div className="pt-16 md:pt-24 min-h-screen text-white pb-10 ">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         {/* Container chính: Grid 1 cột trên mobile, 4 cột trên Desktop (1 trái - 3 phải) */}
@@ -305,6 +316,6 @@ export default function MovieDetail() {
         </div>
       )}
     </div>
-    
+    </>
   );
 }

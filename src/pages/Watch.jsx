@@ -10,8 +10,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { getMovieDetail, getMoviePeoples, getMovieImages, getCastFromTMDB } from "../services/api";
 import RelatedMovies from '../components/movie/RelatedMovies';
-import PageMeta from "../components/PageMeta";
 import ArtPlayer from "../components/player/ArtPlayer";
+import SEO from '../components/SEO';
+import { useMemo } from "react";
 const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
 const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
 const TMDB_BASE_URL = "https://image.tmdb.org/t/p/w185";
@@ -26,8 +27,8 @@ export default function Watch() {
   const [peoples, setPeoples] = useState([]);
   const { addToHistory } = useHistory();
   const [images, setImages] = useState([]);
-
-  // --- 1. FETCH DỮ LIỆU PHIM ---
+  
+  
 
 useEffect(() => {
   let mounted = true;
@@ -118,17 +119,13 @@ const castSettings = {
     episodes.find((ep) => ep.link_m3u8 || ep.link_embed) ||
     null;
   const epName = currentEpisode?.name || "";
-const displayTitle = movie 
-  ? `Xem phim ${movie.name} ${epName ? `- ${epName}` : ""}` 
-  : "Đang tải trình phát...";
-  // --- 3. GỌI HÀM LƯU LỊCH SỬ (Đúng vị trí) ---
-  useEffect(() => {
-    document.title = displayTitle;
-  return () => {
-    document.title = "Phim Cú Đêm - Xem Phim Online Miễn Phí VietSub"; 
-  };
-}, [displayTitle]);
 
+const watchTitle = useMemo(() => {
+    if (!movie) return "Đang tải phim..."; 
+    // Khi có movie, cập nhật tiêu đề chi tiết
+    const epName = movie?.episodes?.[0]?.server_data?.find(e => e.slug === episodeSlug)?.name;
+    return `Đang xem: ${movie.name} ${epName ? `- Tập ${epName}` : ""} | Full HD`;
+  }, [movie, episodeSlug]);
   // --- 4. GỌI HÀM LƯU LỊCH SỬ ---
   useEffect(() => {
     // Chỉ lưu khi ĐÃ tải xong phim và ĐÃ tìm thấy tập phim
@@ -152,8 +149,9 @@ const displayTitle = movie
   }, [loading, movie, currentEpisode, slug, episodeSlug, addToHistory]); // Chỉ chạy khi các biến này thay đổi
 
   // --- 4. KIỂM TRA TRẠNG THÁI LOADING/NULL ---
-  if (loading) return <div className="pt-20 min-h-screen  text-white flex items-center justify-center">
-                <div className="loader"></div>
+  if (loading) return <div className="h-[50vh] flex flex-col items-center justify-center w-full">
+              <div className="loader mb-4"></div>
+              <p className="text-white animate-pulse text-sm font-medium">Đang tải phim...</p>
 
       </div>
   if (!movie) return <div className="pt-20 text-center text-white">Không tìm thấy phim</div>;
@@ -171,9 +169,12 @@ const currentEpName = movie?.episodes?.[0]?.server_data?.find(e => e.slug === ep
 
 
   return (
-    
+    <>
+      <SEO 
+      title={movie ? `${movie.name} (${movie.year})` : "Đang tải..."} 
+      movie={movie} 
+    />
     <div className="pt-20 min-h-screen text-white">
-      
       <div className="max-w-7xl mx-auto px-4 md:px-10 py-10">
 
         {/* ===== TIÊU ĐỀ ===== */}
@@ -340,6 +341,6 @@ const currentEpName = movie?.episodes?.[0]?.server_data?.find(e => e.slug === ep
 <RelatedMovies currentMovie={movie} />
       </div>
     </div>
-    
+    </>
   );
 }
