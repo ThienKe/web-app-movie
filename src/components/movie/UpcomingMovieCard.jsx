@@ -3,10 +3,10 @@ import { getImageUrl } from "../../utils/getImageUrl";
 
 export default function UpcomingMovieCard({ movie }) {
   return (
-    <Link to={`/phim/${movie.slug}`} className="flex-shrink-0 w-[340px]">
+    <Link to={`/phim/${movie.slug}`} className="shrink-0 w-85">
       <div
         className="
-          relative h-[190px]
+          relative h-47.5
           rounded-xl overflow-hidden
           bg-slate-900
           transition-all duration-500
@@ -22,7 +22,7 @@ export default function UpcomingMovieCard({ movie }) {
         />
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
         {/* Title */}
         <div className="absolute bottom-3 left-3 right-3">

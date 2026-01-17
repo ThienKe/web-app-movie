@@ -148,7 +148,7 @@ export default function MovieDetail() {
 
           {/* CỘT 1: POSTER & NÚT BẤM */}
           <div className="w-full flex flex-col items-center lg:items-start">
-            <div className="lg:sticky lg:top-24 w-full max-w-[260px] md:max-w-[300px] lg:max-w-none">
+            <div className="lg:sticky lg:top-24 w-full max-w-65 md:max-w-75 lg:max-w-none">
               <img 
                 src={getImageUrl(movie)} 
                 alt={movie.name} 
@@ -274,7 +274,7 @@ export default function MovieDetail() {
             </section>
 
             {/* NỘI DUNG */}
-            <section className="bg-white/[0.02] p-6 md:p-10 rounded-3xl border border-white/5">
+            <section className="bg-white/2 p-6 md:p-10 rounded-3xl border border-white/5">
               <h3 className="text-xl font-bold mb-4 uppercase tracking-widest text-white">Nội dung phim</h3>
               <p className="text-gray-300 leading-relaxed text-sm md:text-lg text-justify whitespace-pre-line font-light italic">
                 {renderCleanContent(movie.content)}
@@ -298,7 +298,7 @@ export default function MovieDetail() {
 
       {/* Modal Trailer */}
       {isModalOpen && trailer && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-10 bg-black/95 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-2 md:p-10 bg-black/95 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
           <div className="relative w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setIsModalOpen(false)}

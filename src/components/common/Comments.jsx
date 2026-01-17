@@ -62,7 +62,7 @@ const Comments = ({ movieId, movieName }) => {
 };
 
     return (
-        <div className="mt-12 bg-white/[0.02] rounded-3xl p-6 md:p-8 border border-white/5">
+        <div className="mt-12 bg-white/2 rounded-3xl p-6 md:p-8 border border-white/5">
             <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
                 Bình luận <span className="text-sm bg-slate-800 text-white px-2 py-0.5 rounded-full">{list.length}</span>
             </h3>
@@ -86,7 +86,7 @@ const Comments = ({ movieId, movieName }) => {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown} // Thêm sự kiện này
             placeholder="Bạn thấy phim này thế nào? (Ấn Enter để gửi)..."
-            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-16 text-white outline-none focus:border-slate-500 transition min-h-[100px]"
+            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-16 text-white outline-none focus:border-slate-500 transition min-h-25"
         />
         <button type="submit" className="absolute bottom-4 right-4 p-2 bg-slate-600 hover:bg-slate-700 rounded-xl transition">
             <Send className="w-5 h-5 text-white" />
@@ -101,7 +101,7 @@ const Comments = ({ movieId, movieName }) => {
                     list.map(item => (
                         <div key={item.id} className="flex gap-4 group">
                             {/* Avatar vòng tròn chứa chữ cái đầu của tên */}
-                            <div className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white uppercase shadow-lg">
+                            <div className="w-10 h-10 shrink-0 rounded-full bg-linear-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white uppercase shadow-lg">
                                 {item.displayName?.charAt(0) || "U"}
                             </div>
 

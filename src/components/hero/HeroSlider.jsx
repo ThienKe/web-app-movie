@@ -96,12 +96,12 @@ export default function HeroSlider() {
                   alt={movie.name}
                   className="w-full h-full object-cover brightness-[0.35]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-r from-black via-black/70 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
               </div>
 
               {/* MAIN CONTENT */}
-              <div className="relative h-full max-w-[1500px] mx-auto px-6 md:px-16 flex items-center">
+              <div className="relative h-full max-w-375 mx-auto px-6 md:px-16 flex items-center">
                 <div className="w-full lg:w-2/3 space-y-4 md:space-y-6">
 
                   {/* TITLE RESPONSIVE - Sửa tại đây */}
@@ -159,7 +159,7 @@ export default function HeroSlider() {
                   <img
                     src={imageUrl}
                     alt="Poster"
-                    className="w-[280px] 2xl:w-[350px] aspect-[2/3] object-cover rounded-2xl shadow-2xl border border-white/10"
+                    className="w-70 2xl:w-87.5 aspect-2/3 object-cover rounded-2xl shadow-2xl border border-white/10"
                   />
                 </div>
               </div>

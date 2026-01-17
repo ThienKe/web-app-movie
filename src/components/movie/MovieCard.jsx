@@ -13,7 +13,7 @@ export default function MovieCard({ movie, large = false }) {
       className="group block transition-transform duration-300 ease-out will-change-transform"
     >
       <div
-        className={`relative overflow-hidden rounded-xl mb-3 ${large ? "aspect-[9/12]" : "aspect-[2/3]"
+        className={`relative overflow-hidden rounded-xl mb-3 ${large ? "aspect-9/12" : "aspect-2/3"
           }`}
       >
        <img
@@ -29,7 +29,7 @@ export default function MovieCard({ movie, large = false }) {
 />
 
         {/* Overlay */}
-<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+<div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         {/* Top badges */}
         <div className="absolute top-2 left-2 right-2 flex justify-between text-xs font-semibold pointer-events-none">
           {movie.lang && (

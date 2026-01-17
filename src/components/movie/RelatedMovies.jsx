@@ -42,13 +42,13 @@ export default function RelatedMovies({ currentMovie }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
         {loading ? (
           Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="bg-white/[0.03] aspect-[2/3] rounded-2xl animate-pulse border border-white/5" />
+            <div key={i} className="bg-white/3 aspect-2/3 rounded-2xl animate-pulse border border-white/5" />
           ))
         ) : (
           related.map((movie) => (
             <div key={movie._id} className="group">
               <Link to={`/phim/${movie.slug}`} className="block">
-                <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-white/[0.03] border border-white/5 shadow-xl transition-all duration-500 group-hover:border-red-500/50">
+                <div className="relative aspect-2/3 rounded-2xl overflow-hidden bg-white/3 border border-white/5 shadow-xl transition-all duration-500 group-hover:border-red-500/50">
                   <img 
                     src={getImageUrl(movie)} 
                     alt={movie.name} 
@@ -79,7 +79,7 @@ export default function RelatedMovies({ currentMovie }) {
                     </span>
                   </div>
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
 
                 <div className="mt-3 px-1">

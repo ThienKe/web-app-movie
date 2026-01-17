@@ -64,7 +64,7 @@ export default function Home() {
       <HeroSlider />
       <h1 className="sr-only">Phim Cú Đêm - Xem phim online Vietsub Full HD mới nhất</h1>
       {/* Tăng padding cho thoáng đúng ý bạn */}
-     <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 py-10">
+     <div className="max-w-400 mx-auto px-6 md:px-16 lg:px-24 py-10">
       <UpcomingMovieSlider />
     </div>
 

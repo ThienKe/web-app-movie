@@ -125,7 +125,7 @@ export default function List() {
   return (
     <>
       <SEO title={`Danh sách phim ${displayTitle}`} />
-      <div className="pt-24 min-h-screen text-white px-4 md:px-16 lg:px-24 max-w-[1600px] mx-auto">
+      <div className="pt-24 min-h-screen text-white px-4 md:px-16 lg:px-24 max-w-400 mx-auto">
       
       {/* Container Tiêu đề & Bộ lọc: Thêm mb-12 để tạo khoảng cách với các card phim bên dưới */}
       <div className="flex items-center justify-between mb-12 border-b border-white/5 pb-8">
@@ -195,7 +195,7 @@ export default function List() {
                     Trước
                   </button>
 
-                  <div className="w-[1px] h-8 bg-white/10 self-center"></div>
+                  <div className="w-px h-8 bg-white/10 self-center"></div>
 
                   <button
                     onClick={() => handlePageChange(page + 1)}

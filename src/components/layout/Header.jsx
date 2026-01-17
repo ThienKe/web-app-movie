@@ -114,9 +114,9 @@ const Header = () => {
 
     return (
       <div className={`
-      ${isMobile ? 'w-full mt-2' : 'absolute top-full left-0 mt-2 w-[400px]'} 
+      ${isMobile ? 'w-full mt-2' : 'absolute top-full left-0 mt-2 w-100'} 
       bg-slate-900 border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] 
-      z-[999] overflow-hidden
+      z-999 overflow-hidden
     `}>
         {isLoading ? (
           <div className="p-4 text-center text-gray-400 text-sm">
@@ -175,7 +175,7 @@ const Header = () => {
     <>
       {(mobileMenuOpen || mobileSearchOpen) && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45]"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-45"
           onClick={() => { setMobileMenuOpen(false); setMobileSearchOpen(false); }}
         />
       )}
@@ -193,7 +193,7 @@ const Header = () => {
               alt="Phim Cú Đêm"
               className="h-9 w-auto md:h-12 lg:h-14 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]"
             />
-            <span className="text-xl md:text-2xl font-black tracking-tighter bg-gradient-to-r from-white via-gray-200 to-gray-500 bg-clip-text text-transparent hidden sm:block">
+            <span className="text-xl md:text-2xl font-black tracking-tighter bg-linear-to-r from-white via-gray-200 to-gray-500 bg-clip-text text-transparent hidden sm:block">
               PHIM<span className="text-red-600">CÚ</span>ĐÊM
             </span>
           </Link>
@@ -256,7 +256,7 @@ const Header = () => {
 
         {/* MOBILE SEARCH */}
         {mobileSearchOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-slate-900 p-4 border-t border-slate-800 animate-in slide-in-from-top z-[60]">
+          <div className="md:hidden absolute top-full left-0 w-full bg-slate-900 p-4 border-t border-slate-800 animate-in slide-in-from-top z-60">
             <form onSubmit={handleSearch} className="relative">
               <input
                 autoFocus
@@ -340,7 +340,7 @@ function Dropdown({ title, items, type }) {
         {title} <span className="text-[10px]">▼</span>
       </button>
       {open && (
-        <div className="absolute left-0 top-full pt-2 w-[500px] z-50">
+        <div className="absolute left-0 top-full pt-2 w-125 z-50">
           <div className="bg-slate-950 border border-slate-700 rounded-xl p-4 grid grid-cols-3 gap-1 shadow-2xl">
             {items.map(item => (
               <Link key={item.slug} to={`/${type}/${item.slug}`} className="text-gray-400 hover:text-white hover:bg-slate-800 px-3 py-2 rounded-md text-sm transition">

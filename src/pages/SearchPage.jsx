@@ -60,7 +60,7 @@ export default function SearchPage() {
     <>
       <SEO title={seoData.title} description={seoData.description} />
       
-      <div className="pt-24 min-h-screen text-white px-4 md:px-16 lg:px-24 max-w-[1600px] mx-auto">
+      <div className="pt-24 min-h-screen text-white px-4 md:px-16 lg:px-24 max-w-400 mx-auto">
         <h1 className="text-2xl font-semibold mb-10 flex items-baseline gap-2">
           <span className="text-gray-400 font-normal">Kết quả cho:</span>
           <span className="text-white">"{keyword}"</span>
@@ -109,7 +109,7 @@ export default function SearchPage() {
                 Trước
               </button>
 
-              <div className="w-[1px] h-8 bg-white/10 self-center"></div>
+              <div className="w-px h-8 bg-white/10 self-center"></div>
 
               <button
                 onClick={() => handlePageChange(page + 1)}

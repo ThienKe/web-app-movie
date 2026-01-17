@@ -18,7 +18,7 @@ export default function MovieSection({ title, movies, viewAllLink, variant = "de
   if (!displayMovies.length) return null;
 
   return (
-    <section className="w-full max-w-[1600px] mx-auto mb-12 md:mb-24">
+    <section className="w-full max-w-400 mx-auto mb-12 md:mb-24">
       <div className={`
         relative px-4 md:px-16 lg:px-24
         ${isFrame ? 'py-8 md:p-12  ' : ''}
@@ -72,8 +72,7 @@ export default function MovieSection({ title, movies, viewAllLink, variant = "de
                   <Link to={`/phim/${movie.slug}`} className="block group">
                     <div className={`
                       relative overflow-hidden shadow-lg transition-all duration-500 rounded-xl
-                      /* Mobile: Tỉ lệ 2/3 cho tất cả để đồng bộ */
-                      aspect-[2/3]
+                      aspect-2/3
                       /* Desktop Cinema: Giữ tỉ lệ 16/9 ngang */
                       ${isCinema ? 'md:aspect-video md:rounded-2xl' : ''}
                       /* Desktop Highlight */

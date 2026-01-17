@@ -19,7 +19,7 @@ export default function Layout() {
         <Header />
 
       
-        <main className="flex-1 w-full max-w-[1920px] mx-auto relative z-10">
+        <main className="flex-1 w-full max-w-480 mx-auto relative z-10">
           <Outlet />
         </main>
 

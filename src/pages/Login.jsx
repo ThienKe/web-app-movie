@@ -137,7 +137,7 @@ export default function Login() {
 
                 <div className="my-8 text-center text-gray-400 relative">
                     <span className="bg-[#0f172a] px-4 relative z-10 text-xs uppercase font-semibold">Hoặc tiếp tục với</span>
-                    <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/10"></div>
+                    <div className="absolute top-1/2 left-0 w-full h-px bg-white/10"></div>
                 </div>
 
                 <button

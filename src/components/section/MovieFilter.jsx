@@ -80,7 +80,7 @@ export default function MovieFilter({ countries, years, categories }) {
       </div>
 
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4">
+        <div className="fixed inset-0 z-100 flex items-end md:items-center justify-center p-0 md:p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsOpen(false)} />
           
           <div className="relative w-full md:max-w-2xl bg-[#0f0f0f] border-t md:border border-white/10 rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden">
@@ -128,7 +128,7 @@ export default function MovieFilter({ countries, years, categories }) {
             </div>
 
             {/* Footer với 2 nút */}
-            <div className="p-6 bg-white/[0.02] border-t border-white/5 grid grid-cols-2 gap-4">
+            <div className="p-6 bg-white/2 border-t border-white/5 grid grid-cols-2 gap-4">
               <button onClick={handleReset} className="py-4 rounded-2xl bg-white/5 hover:bg-white/10 text-gray-400 font-bold transition-all">Làm mới</button>
               <button onClick={applyFilters} className="py-4 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-600/20">
                 <Search size={18} /> Áp dụng
