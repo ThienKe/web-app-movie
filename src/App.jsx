@@ -8,7 +8,7 @@ import Watch from "./pages/Watch";
 import History from "./pages/History";
 import ScrollToTop from "./components/common/ScrollToTop";
 import SearchPage from "./pages/SearchPage";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import { PrivateRoute } from "./components/PrivateRoute";
 import Favorites from "./pages/Favorites";
