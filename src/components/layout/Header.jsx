@@ -180,10 +180,24 @@ const Header = () => {
         />
       )}
 
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 px-4 md:px-8 lg:px-12 flex items-center justify-between
-  ${scrolled && visible ? 'bg-slate-800/95 backdrop-blur-md shadow-2xl' : 'bg-transparent'}
-  ${visible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'} 
-`}>
+      <header className={`
+        fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 px-4 md:px-8 lg:px-12 flex items-center justify-between
+        
+        /* 1. Logic ẩn hiện chung cho cả 2 thiết bị */
+        ${visible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'} 
+
+        /* 2. Logic Mobile (Dưới 768px): Màu đen đặc, không mờ kính */
+        ${scrolled 
+          ? 'max-md:bg-slate-950 max-md:shadow-xl' 
+          : 'max-md:bg-transparent'
+        }
+
+        /* 3. Logic Desktop (Trên 768px): Giữ nguyên hiệu ứng kính mờ bạn đang thích */
+        ${scrolled 
+          ? 'md:bg-slate-800/95 md:backdrop-blur-md md:shadow-2xl' 
+          : 'md:bg-transparent'
+        }
+      `}>
 
         {/* LOGO */}
         <div className="flex items-center justify-center lg:justify-start w-1/3 lg:w-auto">
