@@ -14,22 +14,31 @@ export const getHomeData = async () => {
   return response.data.data;
 };
 
-export const getCategori = async (slug, page = 1) => {
+export const getCategori = async (slug, page = 1, extraParams = {}) => {
   const response = await api.get(`/the-loai/${slug}`, {
-    params: { page }
+    params: { 
+      page, 
+      ...extraParams 
+    }
   });
   return response.data.data;
 };
 
-export const getCountry = async (slug, page = 1) => {
+export const getCountry = async (slug, page = 1, extraParams = {}) => {
   const response = await api.get(`/quoc-gia/${slug}`, {
-    params: { page }
+    params: { 
+      page, 
+      ...extraParams 
+    }
   });
   return response.data.data;
 };
-export const getListMovies = async (slug, page = 1) => {
+export const getListMovies = async (slug, page = 1, extraParams = {}) => {
   const response = await api.get(`/danh-sach/${slug}`, {
-    params: { page }
+    params: { 
+      page, 
+      ...extraParams 
+    }
   });
   return response.data.data;
 };

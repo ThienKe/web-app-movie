@@ -81,23 +81,23 @@ export default function List() {
 
   useEffect(() => {
     const fetchMovies = async () => {
-      setLoading(true);
-      try {
-        const apiFilters = {
-          ...(countryFilter && { country: countryFilter }),
-          ...(yearFilter && { year: yearFilter }),
-          ...(categoryFilter && { category: categoryFilter }),
-        };
+  setLoading(true);
+  try {
+    // Chỉ thêm vào object nếu filter đó có giá trị
+    const apiFilters = {};
+    if (countryFilter) apiFilters.country = countryFilter;
+    if (yearFilter) apiFilters.year = yearFilter;
+    if (categoryFilter) apiFilters.category = categoryFilter;
 
-        let responseData;
-        if (type === "danh-sach") {
-          responseData = await getListMovies(slug, page, apiFilters);
-        } else if (type === "the-loai") {
-          responseData = await getCategori(slug, page, apiFilters);
-        } else if (type === "quoc-gia") {
-          responseData = await getCountry(slug, page, apiFilters);
-        }
-
+    let responseData;
+    // Bây giờ các hàm này đã nhận apiFilters ở tham số thứ 3
+    if (type === "danh-sach") {
+      responseData = await getListMovies(slug, page, apiFilters);
+    } else if (type === "the-loai") {
+      responseData = await getCategori(slug, page, apiFilters);
+    } else if (type === "quoc-gia") {
+      responseData = await getCountry(slug, page, apiFilters);
+    }
         const items = responseData?.items || [];
         const pagination = responseData?.params?.pagination;
         

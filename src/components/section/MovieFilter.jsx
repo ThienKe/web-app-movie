@@ -35,18 +35,26 @@ export default function MovieFilter({ countries, years, categories }) {
 
   // 3. Hàm thực thi lọc (Chỉ chạy khi nhấn nút)
   const applyFilters = () => {
-    const params = new URLSearchParams(); // Tạo mới để xóa page cũ
+    const params = new URLSearchParams(location.search); // Tạo mới để xóa page cũ
+    // Cập nhật Quốc gia
     if (tempFilters.country) params.set("country", tempFilters.country);
-    if (tempFilters.year) params.set("year", tempFilters.year);
-    if (tempFilters.category) params.set("category", tempFilters.category);
+    else params.delete("country");
     
+    // Cập nhật Năm
+    if (tempFilters.year) params.set("year", tempFilters.year);
+    else params.delete("year");
+    
+    // Cập nhật Thể loại
+    if (tempFilters.category) params.set("category", tempFilters.category);
+    else params.delete("category");
+    params.set("page", "1");
     setIsOpen(false);
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
   const handleReset = () => {
     setTempFilters({ country: "", year: "", category: "" });
-    navigate(location.pathname);
+    navigate(location.pathname, { replace: true });
     setIsOpen(false);
   };
 
