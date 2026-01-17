@@ -11,6 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { getMovieDetail, getMoviePeoples, getMovieImages, getCastFromTMDB } from "../services/api";
 import RelatedMovies from '../components/movie/RelatedMovies';
 import PageMeta from "../components/PageMeta";
+import ArtPlayer from "../components/player/ArtPlayer";
 const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
 const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
 const TMDB_BASE_URL = "https://image.tmdb.org/t/p/w185";
@@ -124,7 +125,7 @@ const displayTitle = movie
   useEffect(() => {
     document.title = displayTitle;
   return () => {
-    document.title = "Phím Cú Đêm - Xem Phim Online Miễn Phí VietSub"; 
+    document.title = "Phim Cú Đêm - Xem Phim Online Miễn Phí VietSub"; 
   };
 }, [displayTitle]);
 
@@ -188,20 +189,21 @@ const currentEpName = movie?.episodes?.[0]?.server_data?.find(e => e.slug === ep
         <div className="aspect-video  rounded-xl overflow-hidden mb-6">
           {currentEpisode?.link_embed &&
             currentEpisode.link_embed.startsWith("http") ? (
-            <iframe
-              src={currentEpisode.link_embed}
-              className="w-full h-full"
-              allowFullScreen
-              frameBorder="0"
-              title="Embed Player"
-            />
+            <ArtPlayer
+    key={`${currentEpisode.link_m3u8}-${episodeSlug}`} // Rất quan trọng để reset player khi đổi tập
+    src={currentEpisode.link_m3u8}
+    movieId={movie._id}
+    episodeSlug={currentEpisode.slug}
+    onEnded={handleNextEpisode}
+  />
           ) : currentEpisode?.link_m3u8 &&
             currentEpisode.link_m3u8.startsWith("http") ? (
             <HlsPlayer
-              src={currentEpisode.link_m3u8}
-              movieId={movie._id}
-              episodeSlug={currentEpisode.slug}
-              onEnded={handleNextEpisode}
+              key={currentEpisode.link_m3u8} // Thêm key để React reset player khi đổi tập
+      src={currentEpisode.link_m3u8}
+      movieId={movie._id}
+      episodeSlug={currentEpisode.slug}
+      onEnded={handleNextEpisode}
             />
 
           ) : (

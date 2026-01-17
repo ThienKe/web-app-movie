@@ -72,7 +72,7 @@ useEffect(() => {
     document.title = "Phim mới nhất - CuDem Movie";
   } else {
     // Logic cho các slug khác (phim-le, phim-bo...)
-    document.title = slug.replace(/-/g, ' ') + " - CuDem Movie";
+    document.title = slug.replace(/-/g, ' ') + " - Phim Cú Đêm - Xem Phim Online Miễn Phí VietSub";
   }
 }, [slug]);
   /* ===== RESET KHI ĐỔI ROUTE CHÍNH ===== */

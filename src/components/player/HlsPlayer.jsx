@@ -3,44 +3,83 @@ import Hls from "hls.js";
 
 export default function HlsPlayer({ src, movieId, episodeSlug, onEnded }) {
   const videoRef = useRef(null);
+  const hlsRef = useRef(null); // Dùng ref để quản lý hls instance tốt hơn
   const storageKey = `progress:${movieId}:${episodeSlug}`;
 
-  // ===== INIT HLS =====
+ 
+  useEffect(() => {
+  
+    if (typeof window !== "undefined") {
+      window.Artplayer = window.Artplayer || {
+        version: "5.2.2",
+        instances: [],
+        contextmenu: { remove: () => {} }, 
+        config: { plugins: [] }
+      };
+    }
+  }, []);
+
+  // 2. KHỞI TẠO PLAYER
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
 
-    let hls;
+    // Reset video khi đổi tập
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
 
     if (Hls.isSupported()) {
-      hls = new Hls({
+      const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: true,
-        backBufferLength: 90,
+        backBufferLength: 60,
+        // Cấu hình quan trọng cho Mobile:
+        manifestLoadingMaxRetry: 10,
+        levelLoadingMaxRetry: 10,
+        fragLoadingMaxRetry: 10,
       });
+
       hls.loadSource(src);
       hls.attachMedia(video);
+      hlsRef.current = hls;
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        // Tự động khôi phục tiến trình sau khi manifest load xong
+        const savedTime = localStorage.getItem(storageKey);
+        if (savedTime) {
+          video.currentTime = Number(savedTime);
+        }
+        // Mobile yêu cầu thao tác người dùng để Play, nhưng nếu đã tương tác trước đó thì autoPlay sẽ chạy
+        video.play().catch(() => console.log("Chờ người dùng nhấn Play..."));
+      });
+
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      // Dành riêng cho Safari (iOS)
       video.src = src;
+      video.addEventListener('loadedmetadata', () => {
+        const savedTime = localStorage.getItem(storageKey);
+        if (savedTime) video.currentTime = Number(savedTime);
+        video.play().catch(() => {});
+      });
     }
 
     return () => {
-      if (hls) hls.destroy();
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+      }
     };
-  }, [src]);
+  }, [src, storageKey]);
 
-  // ===== AUTO RESUME + SAVE PROGRESS =====
+  // 3. LƯU TIẾN TRÌNH & SỰ KIỆN
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const savedTime = localStorage.getItem(storageKey);
-    if (savedTime) {
-      video.currentTime = Number(savedTime);
-    }
-
     const saveProgress = () => {
-      localStorage.setItem(storageKey, video.currentTime);
+      if (video.currentTime > 5) { // Chỉ lưu khi xem được hơn 5s
+        localStorage.setItem(storageKey, video.currentTime);
+      }
     };
 
     video.addEventListener("timeupdate", saveProgress);
@@ -52,57 +91,29 @@ export default function HlsPlayer({ src, movieId, episodeSlug, onEnded }) {
     };
   }, [storageKey, onEnded]);
 
-  // ===== PHÍM TẮT =====
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleKey = (e) => {
-      if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
-
-      switch (e.key.toLowerCase()) {
-        case " ":
-          e.preventDefault();
-          video.paused ? video.play() : video.pause();
-          break;
-        case "arrowright":
-        case "l":
-          video.currentTime += 10;
-          break;
-        case "arrowleft":
-        case "j":
-          video.currentTime -= 10;
-          break;
-        case "arrowup":
-          video.volume = Math.min(video.volume + 0.1, 1);
-          break;
-        case "arrowdown":
-          video.volume = Math.max(video.volume - 0.1, 0);
-          break;
-        case "f":
-          if (!document.fullscreenElement) {
-            video.requestFullscreen();
-          } else {
-            document.exitFullscreen();
-          }
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, []);
-
   return (
-    <video
-      ref={videoRef}
-      controls
-      autoPlay
-      playsInline
-      preload="auto"
-      className="w-full h-full bg-black"
-    />
+    <div 
+      className="relative w-full h-full bg-black overflow-hidden"
+      // Chặn mọi sự kiện chuột phải/giữ tay trên mobile để script share.js không can thiệp được
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      <video
+        ref={videoRef}
+        controls
+        autoPlay
+        playsInline
+        webkit-playsinline="true"
+        x5-playsinline="true"
+        muted={true}
+        preload="metadata"
+        className="art-video w-full h-full" 
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        objectFit: 'contain',
+        maxWidth: '100%' 
+      }}
+      />
+    </div>
   );
 }

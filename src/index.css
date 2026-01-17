@@ -103,3 +103,26 @@ iframe {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Buộc Artplayer phải chiếm toàn bộ không gian của thẻ div cha */
+.artplayer-app {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 10;
+}
+
+/* Đảm bảo thẻ video bên trong không bị script lạ can thiệp */
+.art-video {
+  pointer-events: auto !important;
+}
+
+/* Fix lỗi các thanh điều khiển (control bar) bị mất hoặc ẩn */
+.art-controls {
+  z-index: 20 !important;
+}
+
+/* Đảm bảo khung aspect-video của bạn không chặn sự kiện */
+.aspect-video {
+  pointer-events: auto !important;
+  position: relative;
+}

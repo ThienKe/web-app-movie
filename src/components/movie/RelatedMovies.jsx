@@ -16,7 +16,7 @@ export default function RelatedMovies({ currentMovie }) {
         const items = await getCategori(catSlug, 1);
         if (items) {
           const filtered = items.filter(m => m.slug !== currentMovie.slug);
-          setRelated(filtered.slice(0, 18));
+          setRelated(filtered.slice(0, 20));
         }
       } catch (error) {
         console.error("Lỗi:", error);

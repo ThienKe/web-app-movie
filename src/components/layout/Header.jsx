@@ -58,7 +58,7 @@ const Header = () => {
 
         {/* LEFT: LOGO */}
         <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-          <img src="/logo.png" alt="Logo" className="h-9 md:h-11 w-auto object-contain transition group-hover:scale-105" />
+          
           <span className="text-xl md:text-2xl font-black tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent hidden sm:block">
             PhimCúĐêm
           </span>

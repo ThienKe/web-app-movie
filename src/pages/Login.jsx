@@ -1,82 +1,75 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react"; // Đã thêm useEffect vào đây
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import { User as UserIcon, Lock, Loader2 } from "lucide-react";
-import { useRef } from "react";
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 import { rtdb } from "../firebase"; 
-
 
 export default function Login() {
     const { loginWithGoogle, loginWithEmail } = useAuthContext();
     const navigate = useNavigate();
     
-    // 1. Chỉ dùng Ref để bảo mật F12, bỏ State identifier/password đi
     const identifierRef = useRef();
     const passwordRef = useRef();
     
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // 2. Hàm xử lý đăng nhập gọn gàng nhất
-    const onLoginClick = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const identifier = identifierRef.current.value.trim();
-    const password = passwordRef.current.value.trim();
+    // ĐƯA USEEFFECT RA NGOÀI NÀY (Cấp cao nhất của Component)
     useEffect(() => {
-      document.title = "Trang Đăng Nhập Tài Khoản - CuDem Movie";
-      
-      // Khi rời trang, trả về tên mặc định
-      return () => { document.title = "Phim Cú Đêm - Xem Phim Hay Online Miễn Phí VietSub"; };
+        document.title = "Trang Đăng Nhập Tài Khoản - CuDem Movie";
+        return () => { 
+            document.title = "Phim Cú Đêm - Xem Phim Hay Online Miễn Phí VietSub"; 
+        };
     }, []);
 
-    try {
-        let emailToLogin = "";
+    const onLoginClick = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
 
-        // TRƯỜNG HỢP 1: Người dùng nhập thẳng Email
-        if (identifier.includes("@")) {
-            emailToLogin = identifier;
-        } 
-        // TRƯỜNG HỢP 2: Người dùng nhập Username
-        else {
-            const usersRef = ref(rtdb, "users");
-            const userQuery = query(usersRef, orderByChild("username"), equalTo(identifier));
-            const snapshot = await get(userQuery);
+        const identifier = identifierRef.current.value.trim();
+        const password = passwordRef.current.value.trim();
 
-            if (snapshot.exists()) {
-                const usersData = snapshot.val();
-                // Lấy email từ user đầu tiên tìm thấy
-                const userKey = Object.keys(usersData)[0];
-                emailToLogin = usersData[userKey].email;
+        try {
+            let emailToLogin = "";
+
+            if (identifier.includes("@")) {
+                emailToLogin = identifier;
             } else {
-                // NGẮN CHẶN TẠI ĐÂY: Nếu không tìm thấy username, không được gọi hàm login
-                setLoading(false);
-                return setError("Tên đăng nhập không tồn tại!");
+                const usersRef = ref(rtdb, "users");
+                const userQuery = query(usersRef, orderByChild("username"), equalTo(identifier));
+                const snapshot = await get(userQuery);
+
+                if (snapshot.exists()) {
+                    const usersData = snapshot.val();
+                    const userKey = Object.keys(usersData)[0];
+                    emailToLogin = usersData[userKey].email;
+                } else {
+                    setLoading(false);
+                    return setError("Tên đăng nhập không tồn tại!");
+                }
             }
-        }
 
-        // Kiểm tra cuối cùng trước khi "nộp" cho Firebase
-        if (!emailToLogin || !emailToLogin.includes("@")) {
+            if (!emailToLogin || !emailToLogin.includes("@")) {
+                setLoading(false);
+                return setError("Không thể xác định email của tài khoản này!");
+            }
+
+            await loginWithEmail(emailToLogin, password);
+            navigate("/");
+
+        } catch (err) {
+            console.error("Lỗi đăng nhập:", err.code);
+            if (err.code === "auth/invalid-email") setError("Email không đúng định dạng!");
+            else if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") 
+                setError("Mật khẩu không chính xác!");
+            else if (err.code === "auth/user-not-found") setError("Tài khoản không tồn tại!");
+            else setError("Lỗi: " + (err.message || "Không thể đăng nhập"));
+        } finally {
             setLoading(false);
-            return setError("Không thể xác định email của tài khoản này!");
         }
-
-        // Gọi hàm đăng nhập chính thức
-        await loginWithEmail(emailToLogin, password);
-        navigate("/");
-
-    } catch (err) {
-        console.error("Lỗi đăng nhập:", err.code);
-        if (err.code === "auth/invalid-email") setError("Email không đúng định dạng!");
-        else if (err.code === "auth/invalid-credential") setError("Mật khẩu không chính xác!");
-        else setError("Lỗi: " + (err.message || "Không thể đăng nhập"));
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
     const handleGoogleLogin = async () => {
         try {
@@ -89,14 +82,13 @@ export default function Login() {
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center text-white p-4">
-    
-            <div className="p-8 rounded-2xl w-full max-w-md border border-white/10 shadow-2xl  backdrop-blur-xl">
+            <div className="p-8 rounded-2xl w-full max-w-md border border-white/10 shadow-2xl backdrop-blur-xl bg-slate-900/50">
                 <h1 className="text-2xl font-semibold mb-8 text-center text-white tracking-widest uppercase">
                     Đăng nhập
                 </h1>
 
                 {error && (
-                    <div className="bg-red-500/20 border  text-white p-3 rounded-lg mb-6 text-sm text-center font-medium">
+                    <div className="bg-red-500/20 border border-red-500/50 text-white p-3 rounded-lg mb-6 text-sm text-center font-medium">
                         {error}
                     </div>
                 )}
@@ -107,7 +99,7 @@ export default function Login() {
                         <input
                             ref={identifierRef}
                             type="text"
-                            name="username" // Thêm name để trình duyệt hỗ trợ autofill an toàn
+                            name="username"
                             placeholder="Username hoặc Email"
                             className="p-3 pl-10 w-full rounded-xl bg-slate-800 border border-slate-700 focus:border-white focus:outline-none transition text-white"
                             required
@@ -130,24 +122,23 @@ export default function Login() {
 
                     <button
                         disabled={loading}
-                        className="bg-red-600 hover:bg-red-800 p-3 rounded-xl font-bold transition shadow-lg  flex items-center justify-center gap-2"
+                        className="bg-red-600 hover:bg-red-800 p-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                         {loading ? <Loader2 className="animate-spin h-5 w-5" /> : "ĐĂNG NHẬP"}
                     </button>
                 </form>
 
-                {/* PHẦN NÀY SẼ HIỆN NÚT CHUYỂN TRANG */}
                 <div className="mt-8 text-center">
                     <p className="text-sm text-gray-400">
                         Chưa có tài khoản?{" "}
-                        <Link to="/dang-ky" className="text-shadow-red-700 font-bold hover:text-red-600 transition-colors underline-offset-4 hover:underline">
+                        <Link to="/dang-ky" className="text-red-500 font-bold hover:text-red-600 transition-colors underline-offset-4 hover:underline">
                             Tạo tài khoản mới
                         </Link>
                     </p>
                 </div>
 
                 <div className="my-8 text-center text-gray-400 relative">
-                    <span className=" px-4 relative z-10 text-xs uppercase font-semibold">Hoặc tiếp tục với</span>
+                    <span className="bg-[#0f172a] px-4 relative z-10 text-xs uppercase font-semibold">Hoặc tiếp tục với</span>
                     <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/10"></div>
                 </div>
 
@@ -156,6 +147,7 @@ export default function Login() {
                     onClick={handleGoogleLogin}
                     className="w-full bg-white text-black p-3.5 rounded-xl font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-3"
                 >
+                    {/* Google SVG Icon giữ nguyên */}
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
