@@ -16,7 +16,7 @@ import { getImageUrl } from "../utils/getImageUrl";
 import noImage from "../assets/no-image.jpg";
 import Comments from '../components/common/Comments';
 import RelatedMovies from '../components/movie/RelatedMovies';
-
+import PageMeta from "../components/PageMeta";
 const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
 const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
 
@@ -31,7 +31,10 @@ export default function MovieDetail() {
   const [peoples, setPeoples] = useState([]);
   const [images, setImages] = useState([]);
   const TMDB_BASE_URL = "https://image.tmdb.org/t/p/w185";
-
+  const displayTitle = movie ? `${movie.name} (${movie.year}) - Xem Phim` : "Đang tải thông tin phim...";
+  useEffect(() => {
+    document.title = displayTitle;
+  }, [displayTitle]);
   useEffect(() => {
     let mounted = true;
     const fetchAllData = async () => {
@@ -126,9 +129,9 @@ export default function MovieDetail() {
   };
 
   return (
+    
     <div className="pt-16 md:pt-24 min-h-screen text-white pb-10 ">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
-        
         {/* Container chính: Grid 1 cột trên mobile, 4 cột trên Desktop (1 trái - 3 phải) */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
 
@@ -302,5 +305,6 @@ export default function MovieDetail() {
         </div>
       )}
     </div>
+    
   );
 }

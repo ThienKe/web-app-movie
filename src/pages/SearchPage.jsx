@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import MovieCard from "../components/movie/MovieCard";
 import MovieCardSkeleton from "../components/movie/MovieCardSkeleton";
 import { searchMovies } from "../services/api";
+import PageMeta from "../components/PageMeta";
 
 export default function SearchPage() {
   const [params] = useSearchParams();
@@ -11,7 +12,14 @@ export default function SearchPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-
+const query = new URLSearchParams(window.location.search).get("q");
+useEffect(() => {
+    if (query) {
+      document.title = `Kết quả tìm kiếm: ${query}`;
+    } else {
+      document.title = "Tìm kiếm phim";
+    }
+  }, [query]);
   // 1. Reset trạng thái khi từ khóa thay đổi
   useEffect(() => {
     setMovies([]);
@@ -51,6 +59,7 @@ export default function SearchPage() {
 
   return (
     <div className="pt-24 min-h-screen text-white px-4 md:px-8 max-w-[1400px] mx-auto">
+      <PageMeta title={query ? `Kết quả tìm kiếm: ${query}` : "Tìm kiếm phim"} />
       <h1 className="text-2xl font-semibold mb-8  pl-4">
         Kết quả cho: <span className="text-white font-semibold">"{keyword}"</span>
       </h1>

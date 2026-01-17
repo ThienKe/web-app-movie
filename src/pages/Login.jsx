@@ -5,6 +5,8 @@ import { User as UserIcon, Lock, Loader2 } from "lucide-react";
 import { useRef } from "react";
 import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 import { rtdb } from "../firebase"; 
+
+
 export default function Login() {
     const { loginWithGoogle, loginWithEmail } = useAuthContext();
     const navigate = useNavigate();
@@ -24,6 +26,12 @@ export default function Login() {
 
     const identifier = identifierRef.current.value.trim();
     const password = passwordRef.current.value.trim();
+    useEffect(() => {
+      document.title = "Trang Đăng Nhập Tài Khoản - CuDem Movie";
+      
+      // Khi rời trang, trả về tên mặc định
+      return () => { document.title = "Phim Cú Đêm - Xem Phim Hay Online Miễn Phí VietSub"; };
+    }, []);
 
     try {
         let emailToLogin = "";
@@ -81,6 +89,7 @@ export default function Login() {
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center text-white p-4">
+    
             <div className="p-8 rounded-2xl w-full max-w-md border border-white/10 shadow-2xl  backdrop-blur-xl">
                 <h1 className="text-2xl font-semibold mb-8 text-center text-white tracking-widest uppercase">
                     Đăng nhập

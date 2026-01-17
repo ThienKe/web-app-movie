@@ -10,7 +10,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { getMovieDetail, getMoviePeoples, getMovieImages, getCastFromTMDB } from "../services/api";
 import RelatedMovies from '../components/movie/RelatedMovies';
-
+import PageMeta from "../components/PageMeta";
 const Slider = ReactSlider.default ? ReactSlider.default : ReactSlider;
 const USER_PLACEHOLDER = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-4-user-grey-d8fe357375ec6d53937133c9099a1f51.svg";
 const TMDB_BASE_URL = "https://image.tmdb.org/t/p/w185";
@@ -75,7 +75,7 @@ useEffect(() => {
       if (mounted) setLoading(false);
     }
   };
-
+  
   fetchAllData();
   return () => { mounted = false; };
 }, [slug]);
@@ -116,8 +116,19 @@ const castSettings = {
     episodes.find((ep) => ep.slug === episodeSlug && (ep.link_m3u8 || ep.link_embed)) ||
     episodes.find((ep) => ep.link_m3u8 || ep.link_embed) ||
     null;
-
+  const epName = currentEpisode?.name || "";
+const displayTitle = movie 
+  ? `Xem phim ${movie.name} ${epName ? `- ${epName}` : ""}` 
+  : "Đang tải trình phát...";
   // --- 3. GỌI HÀM LƯU LỊCH SỬ (Đúng vị trí) ---
+  useEffect(() => {
+    document.title = displayTitle;
+  return () => {
+    document.title = "Phím Cú Đêm - Xem Phim Online Miễn Phí VietSub"; 
+  };
+}, [displayTitle]);
+
+  // --- 4. GỌI HÀM LƯU LỊCH SỬ ---
   useEffect(() => {
     // Chỉ lưu khi ĐÃ tải xong phim và ĐÃ tìm thấy tập phim
     if (!loading && movie && currentEpisode) {
@@ -131,14 +142,13 @@ const castSettings = {
         episode_slug: episodeSlug || currentEpisode.slug,
       };
 
-      // Sử dụng setTimeout để đảm bảo việc lưu không chặn tiến trình render trang
       const timer = setTimeout(() => {
         addToHistory(historyData);
       }, 1000);
 
       return () => clearTimeout(timer);
     }
-  }, [loading, movie, currentEpisode, slug, episodeSlug]); // Chỉ chạy khi các biến này thay đổi
+  }, [loading, movie, currentEpisode, slug, episodeSlug, addToHistory]); // Chỉ chạy khi các biến này thay đổi
 
   // --- 4. KIỂM TRA TRẠNG THÁI LOADING/NULL ---
   if (loading) return <div className="pt-20 min-h-screen  text-white flex items-center justify-center">
@@ -156,11 +166,13 @@ const castSettings = {
     if (nextEp) navigate(`/xem/${slug}/${nextEp.slug}`);
   };
 
-
+const currentEpName = movie?.episodes?.[0]?.server_data?.find(e => e.slug === episodeSlug)?.name;
 
 
   return (
+    
     <div className="pt-20 min-h-screen text-white">
+      
       <div className="max-w-7xl mx-auto px-4 md:px-10 py-10">
 
         {/* ===== TIÊU ĐỀ ===== */}
@@ -326,5 +338,6 @@ const castSettings = {
 <RelatedMovies currentMovie={movie} />
       </div>
     </div>
+    
   );
 }

@@ -4,6 +4,7 @@ import HeroSlider from "../components/hero/HeroSlider";
 import MovieSection from "../components/movie/MovieSection";
 import { getListMovies, getCountry, getCategori } from "../services/api"; // Gom nhóm import
 import UpcomingMovieSlider from "../components/section/UpcomingMovieSlider";
+import PageMeta from "../components/PageMeta";
 
 export default function Home() {
   const [sections, setSections] = useState({
@@ -11,7 +12,7 @@ export default function Home() {
     hoatHinh: [], hanhDong: [], thaiLan: [], thuyetminh: [], longtieng: [],vietnam: [],
     loading: true
   });
-
+    
   useEffect(() => {
     const fetchSections = async () => {
       try {
@@ -52,8 +53,7 @@ export default function Home() {
 
   return (
     <div className="bg-transparent">
-      <title>Phim Cú Đêm - Xem phim hay online miễn phí</title>
-
+      <PageMeta title="Trang Chủ" description="Xem phim miễn phí..." />
       <HeroSlider />
       
       {/* Tăng padding cho thoáng đúng ý bạn */}
